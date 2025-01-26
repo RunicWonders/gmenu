@@ -1,0 +1,45 @@
+# GeyserMenu 配置文件
+# 作者: 柠枺
+# 版本: 1.0.0
+
+# 插件设置
+settings:
+  # 默认菜单文件名
+  default-menu: "menu.yml"
+  
+  # 消息前缀
+  prefix: "§6[GeyserMenu] §f"
+  
+  # 调试模式
+  debug: false
+
+# 菜单配置
+menus:
+  # 主菜单
+  main:
+    file: "menu.yml"
+    enable: true
+  
+  # 传送菜单
+  teleport:
+    file: "teleport.yml"
+    enable: true
+  
+  # 商店菜单
+  shop:
+    file: "shop.yml"
+    enable: true
+  
+  # 示例：禁用的菜单
+  example:
+    file: "example.yml"
+    enable: false
+
+# 消息设置
+messages:
+  reload-success: "§a配置重载成功!"
+  no-permission: "§c你没有权限执行此命令!"
+  player-only: "§c此命令只能由玩家执行!"
+  bedrock-only: "§c此命令仅支持基岩版玩家使用!"
+  menu-not-found: "§c未找到指定的菜单配置!"
+  menu-format-error: "§c菜单配置格式错误!"

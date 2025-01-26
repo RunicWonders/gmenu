@@ -1,0 +1,32 @@
+name: GeyserMenu
+version: '1.0.0'
+main: cn.ningmo.geysermenu.GeyserMenu
+author: 柠枺
+api-version: 1.13
+depend: [Geyser-Spigot, floodgate]
+softdepend: [PlaceholderAPI]
+description: 一个轻量化且简单的基岩版自定义表单插件
+
+commands:
+  geysermenu:
+    description: GeyserMenu主命令
+    usage: "§c用法: /gmenu help 查看帮助信息"
+    aliases: [gmenu]
+
+permissions:
+  geysermenu.use:
+    description: 允许使用菜单命令
+    default: true
+  geysermenu.reload:
+    description: 允许重载插件配置
+    default: op
+  geysermenu.open:
+    description: 允许为其他玩家打开菜单
+    default: op
+  geysermenu.*:
+    description: 允许使用所有GeyserMenu功能
+    default: op
+    children:
+      geysermenu.use: true
+      geysermenu.reload: true
+      geysermenu.open: true 

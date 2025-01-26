@@ -1,0 +1,5 @@
+# 默认忽略的文件
+.idea
+target
+geysermenu.iml
+gm.iml

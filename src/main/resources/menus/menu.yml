@@ -1,0 +1,15 @@
+menu:
+  title: "服务器菜单"
+  items:
+    - text: "传送菜单"
+      icon: "minecraft:compass"
+      submenu: "teleport.yml"  # 指向子菜单文件
+    
+    - text: "商店菜单"
+      icon: "minecraft:chest"
+      submenu: "shop.yml"
+    
+    - text: "返回主城"
+      icon: "minecraft:nether_star"
+      command: "spawn"
+      execute_as: "player" 

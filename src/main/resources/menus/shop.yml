@@ -1,0 +1,16 @@
+menu:
+  title: "商店菜单"
+  items:
+    - text: "返回上级菜单"
+      icon: "minecraft:arrow"
+      submenu: "menu.yml"
+    
+    - text: "方块商店"
+      icon: "minecraft:grass_block"
+      command: "shop blocks"
+      execute_as: "player"
+    
+    - text: "物品商店"
+      icon: "minecraft:diamond"
+      command: "shop items"
+      execute_as: "player" 

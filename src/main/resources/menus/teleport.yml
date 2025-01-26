@@ -1,0 +1,16 @@
+menu:
+  title: "传送菜单"
+  items:
+    - text: "返回上级菜单"
+      icon: "minecraft:arrow"
+      submenu: "menu.yml"
+    
+    - text: "传送到矿区"
+      icon: "minecraft:diamond_pickaxe"
+      command: "warp mine"
+      execute_as: "player"
+    
+    - text: "传送到农场"
+      icon: "minecraft:wheat"
+      command: "warp farm"
+      execute_as: "player" 
