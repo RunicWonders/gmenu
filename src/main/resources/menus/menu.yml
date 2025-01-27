@@ -1,15 +1,24 @@
 menu:
-  title: "服务器菜单"
+  title: "§6服务器菜单"
+  subtitle: "§7欢迎来到服务器"
+  content: |-
+    §e这是服务器的主菜单
+    §f你可以在这里选择要进行的操作
+    §7点击下方按钮开始吧
+  footer: "§8服务器当前在线: %server_online% 人"
   items:
-    - text: "传送菜单"
+    - text: "§9传送菜单"
+      description: "传送到服务器各个区域"
       icon: "minecraft:compass"
-      submenu: "teleport.yml"  # 指向子菜单文件
+      submenu: "teleport.yml"
     
-    - text: "商店菜单"
+    - text: "§a商店菜单"
+      description: "购买和出售物品"
       icon: "minecraft:chest"
       submenu: "shop.yml"
     
-    - text: "返回主城"
+    - text: "§b返回主城"
+      description: "点击立即返回主城出生点"
       icon: "minecraft:nether_star"
       command: "spawn"
       execute_as: "player" 

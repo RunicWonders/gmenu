@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MenuCommand implements CommandExecutor, TabCompleter {
     private final GeyserMenu plugin;
@@ -22,30 +23,32 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
             switch (args[0].toLowerCase()) {
                 case "reload":
                     if (!sender.hasPermission("geysermenu.reload")) {
-                        sender.sendMessage(plugin.getMessage("no-permission"));
+                        sender.sendMessage(plugin.getMessage("error.no-permission"));
                         return true;
                     }
+                    sender.sendMessage(plugin.getMessage("reload.start"));
                     plugin.reloadConfig();
+                    plugin.reloadMessages();
                     plugin.getMenuManager().loadMenus();
-                    sender.sendMessage(plugin.getMessage("reload-success"));
+                    sender.sendMessage(plugin.getMessage("reload.success"));
                     return true;
                     
                 case "open":
                     if (!sender.hasPermission("geysermenu.open")) {
-                        sender.sendMessage(plugin.getMessage("no-permission"));
+                        sender.sendMessage(plugin.getMessage("error.no-permission"));
                         return true;
                     }
                     if (args.length < 3) {
-                        sender.sendMessage(plugin.getPrefix() + "§c用法: /gmenu open <玩家名> <菜单名>");
+                        sender.sendMessage(plugin.getMessage("command.usage", plugin.getRawMessage("command.open.usage")));
                         return true;
                     }
                     Player target = Bukkit.getPlayer(args[1]);
                     if (target == null) {
-                        sender.sendMessage(plugin.getPrefix() + "§c找不到玩家: " + args[1]);
+                        sender.sendMessage(plugin.getMessage("error.player-not-found", args[1]));
                         return true;
                     }
                     plugin.getMenuManager().openMenu(target, args[2]);
-                    sender.sendMessage(plugin.getPrefix() + "§a已为玩家 " + target.getName() + " 打开菜单!");
+                    sender.sendMessage(plugin.getMessage("command.open.success", target.getName()));
                     return true;
                     
                 case "help":
@@ -54,52 +57,73 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
             }
         }
         
-        // 如果是玩家且没有指定子命令，打开默认菜单
+        // 如果没有参数或参数不匹配任何子命令
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (!player.hasPermission("geysermenu.use")) {
-                sender.sendMessage(plugin.getMessage("no-permission"));
+                sender.sendMessage(plugin.getMessage("error.no-permission"));
                 return true;
             }
             plugin.getMenuManager().openMenu(player, plugin.getConfig().getString("settings.default-menu", "menu.yml"));
         } else {
-            // 如果是控制台且没有指定子命令，显示帮助信息
-            sendHelpMessage(sender);
+            // 如果是控制台且没有有效的子命令，显示帮助信息
+            if (args.length == 0) {
+                sendHelpMessage(sender);
+            } else {
+                sender.sendMessage(plugin.getMessage("error.unknown-command"));
+            }
         }
         return true;
     }
     
     private void sendHelpMessage(CommandSender sender) {
-        sender.sendMessage("§6========== GeyserMenu 帮助 ==========");
-        sender.sendMessage("§f/gmenu §7- 打开默认菜单");
-        sender.sendMessage("§f/gmenu help §7- 显示此帮助信息");
+        sender.sendMessage(plugin.getRawMessage("command.help.header"));
+        sender.sendMessage(plugin.getRawMessage("command.help.menu"));
+        sender.sendMessage(plugin.getRawMessage("command.help.help"));
         if (sender.hasPermission("geysermenu.reload")) {
-            sender.sendMessage("§f/gmenu reload §7- 重载插件配置");
+            sender.sendMessage(plugin.getRawMessage("command.help.reload"));
         }
         if (sender.hasPermission("geysermenu.open")) {
-            sender.sendMessage("§f/gmenu open <玩家名> <菜单名> §7- 为指定玩家打开菜单");
+            sender.sendMessage(plugin.getRawMessage("command.help.open"));
         }
-        sender.sendMessage("§6==================================");
+        sender.sendMessage(plugin.getRawMessage("command.help.footer"));
     }
     
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
         
-        if (args.length == 1) {
-            completions.add("help");
-            if (sender.hasPermission("geysermenu.reload")) {
-                completions.add("reload");
+        try {
+            if (args.length == 1) {
+                // 基础命令
+                completions.add("help");
+                
+                // 权限命令
+                if (sender.hasPermission("geysermenu.reload")) {
+                    completions.add("reload");
+                }
+                if (sender.hasPermission("geysermenu.open")) {
+                    completions.add("open");
+                }
+                
+                // 过滤已输入的内容
+                return completions.stream()
+                    .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .collect(Collectors.toList());
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("open") && sender.hasPermission("geysermenu.open")) {
+                // 补全在线玩家名
+                return Bukkit.getOnlinePlayers().stream()
+                    .map(Player::getName)
+                    .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
+                    .collect(Collectors.toList());
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("open") && sender.hasPermission("geysermenu.open")) {
+                // 补全菜单名
+                return plugin.getMenuManager().getMenuList().stream()
+                    .filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase()))
+                    .collect(Collectors.toList());
             }
-            if (sender.hasPermission("geysermenu.open")) {
-                completions.add("open");
-            }
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("open")) {
-            // 补全在线玩家名
-            Bukkit.getOnlinePlayers().forEach(player -> completions.add(player.getName()));
-        } else if (args.length == 3 && args[0].equalsIgnoreCase("open")) {
-            // 补全菜单名
-            completions.addAll(plugin.getMenuManager().getMenuList());
+        } catch (Exception e) {
+            plugin.getLogger().warning("Tab补全时发生错误: " + e.getMessage());
         }
         
         return completions;

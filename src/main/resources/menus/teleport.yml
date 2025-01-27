@@ -1,16 +1,18 @@
 menu:
-  title: "传送菜单"
+  title: "§9传送菜单"
+  subtitle: "§7选择你要传送的地点"
+  content: "§f点击下方按钮传送到对应地点"
   items:
-    - text: "返回上级菜单"
+    - text: "§c返回上级菜单"
       icon: "minecraft:arrow"
       submenu: "menu.yml"
     
-    - text: "传送到矿区"
+    - text: "§e传送到矿区"
       icon: "minecraft:diamond_pickaxe"
       command: "warp mine"
       execute_as: "player"
     
-    - text: "传送到农场"
+    - text: "§a传送到农场"
       icon: "minecraft:wheat"
       command: "warp farm"
       execute_as: "player" 

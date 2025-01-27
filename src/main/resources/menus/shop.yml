@@ -1,16 +1,25 @@
 menu:
-  title: "商店菜单"
+  title: "§a商店菜单"
+  subtitle: "§7选择要浏览的商店类型"
+  content: |-
+    §f在这里你可以：
+    §7- 购买各种方块
+    §7- 购买特殊物品
+  footer: "§8你的余额: %vault_eco_balance%"
   items:
-    - text: "返回上级菜单"
+    - text: "§c返回上级菜单"
+      description: "返回到主菜单"
       icon: "minecraft:arrow"
       submenu: "menu.yml"
     
-    - text: "方块商店"
+    - text: "§e方块商店"
+      description: "购买各种建筑方块"
       icon: "minecraft:grass_block"
       command: "shop blocks"
       execute_as: "player"
     
-    - text: "物品商店"
+    - text: "§b物品商店"
+      description: "购买各种特殊物品"
       icon: "minecraft:diamond"
       command: "shop items"
       execute_as: "player" 
