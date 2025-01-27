@@ -13,14 +13,14 @@ messages:
     bedrock-only: "§c此命令仅支持基岩版玩家使用!"
     menu-not-found: "§c未找到指定的菜单配置!"
     menu-format-error: "§c菜单配置格式错误!"
-    player-not-found: "§c找不到玩家: {0}"
+    player-not-found: "§c找不到玩家: %s"
     command-error: "§c执行命令时出错!"
     form-error: "§c打开菜单时出错，请联系管理员!"
     placeholder-error: "§c处理变量时出错!"
     unknown-command: "§c未知的命令，使用 /gmenu help 查看帮助"
   
   command:
-    usage: "§c用法: {0}"
+    usage: "§c用法: %s"
     help:
       header: "§6========== GeyserMenu 帮助 =========="
       footer: "§6=================================="
@@ -30,5 +30,5 @@ messages:
       open: "§f/gmenu open <玩家名> <菜单名> §7- 为指定玩家打开菜单"
     
     open:
-      success: "§a已为玩家 {0} 打开菜单!"
+      success: "§a已为玩家 %s 打开菜单!"
       usage: "/gmenu open <玩家名> <菜单名>" 

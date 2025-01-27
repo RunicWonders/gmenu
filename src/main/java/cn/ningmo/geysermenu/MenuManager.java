@@ -6,7 +6,6 @@ import org.geysermc.cumulus.SimpleForm;
 import org.geysermc.floodgate.api.FloodgateApi;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.geysermc.cumulus.component.ButtonComponent;
 import org.geysermc.floodgate.api.player.FloodgatePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import java.util.List;
@@ -15,10 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.geysermc.cumulus.response.SimpleFormResponse;
 import org.geysermc.cumulus.util.FormImage;
-import org.geysermc.cumulus.CustomForm;
-import org.geysermc.cumulus.response.CustomFormResponse;
+
 import java.util.ArrayList;
-import java.io.IOException;
 
 public class MenuManager {
     private final GeyserMenu plugin;
@@ -40,32 +37,31 @@ public class MenuManager {
             menus.clear();
             
             // 从配置文件加载菜单
-            ConfigurationSection menuSection = plugin.getConfig().getConfigurationSection("menus");
-            if (menuSection != null) {
-                for (String menuId : menuSection.getKeys(false)) {
-                    ConfigurationSection menu = menuSection.getConfigurationSection(menuId);
-                    if (menu != null && menu.getBoolean("enable", true)) {
-                        String fileName = menu.getString("file");
-                        if (fileName != null) {
-                            // 检查文件名安全性
-                            if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
-                                plugin.getLogger().warning("检测到不安全的菜单文件名: " + fileName);
-                                continue;
+            ConfigurationSection section = plugin.getConfig().getConfigurationSection("menus");
+            section.getKeys(false).forEach(menuKey -> {
+                try {
+                    ConfigurationSection menu = section.getConfigurationSection(menuKey);
+                    if (!menu.getBoolean("enable", true)) return;
+
+                    String fileName = menu.getString("file");
+                    // 检查文件名安全性
+                    if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
+                        plugin.getLogger().warning("检测到不安全的菜单文件名: " + fileName);
+                    } else {
+                        File menuFile = new File(menuFolder, fileName);
+                        if (menuFile.exists()) {
+                            menus.put(fileName, YamlConfiguration.loadConfiguration(menuFile));
+                            if (plugin.getConfig().getBoolean("settings.debug")) {
+                                plugin.getLogger().info("已加载菜单: " + fileName);
                             }
-                            
-                            File menuFile = new File(menuFolder, fileName);
-                            if (menuFile.exists()) {
-                                menus.put(fileName, YamlConfiguration.loadConfiguration(menuFile));
-                                if (plugin.getConfig().getBoolean("settings.debug")) {
-                                    plugin.getLogger().info("已加载菜单: " + fileName);
-                                }
-                            } else {
-                                plugin.getLogger().warning("菜单文件不存在: " + fileName);
-                            }
+                        } else {
+                            plugin.getLogger().warning("菜单文件不存在: " + fileName);
                         }
                     }
+                } catch (NullPointerException e) {
+                    plugin.getLogger().severe("读取菜单 "+menuKey+" 的参数时出现问题, 你是否有值未输入?");
                 }
-            }
+            });
         } catch (Exception e) {
             plugin.getLogger().severe("加载菜单时发生错误: " + e.getMessage());
             e.printStackTrace();
