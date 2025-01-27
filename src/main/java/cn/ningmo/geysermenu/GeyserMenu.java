@@ -13,6 +13,11 @@ public class GeyserMenu extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            // 防止重复初始化
+            if (instance != null) {
+                getLogger().warning("检测到插件重复加载!");
+                return;
+            }
             instance = this;
             
             // 检查前置插件
@@ -22,11 +27,26 @@ public class GeyserMenu extends JavaPlugin {
                 return;
             }
             
+            // 添加配置检查
+            if (!checkConfig()) {
+                getLogger().severe("配置文件检查失败，插件将被禁用!");
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+            
             // 保存默认配置
             saveDefaultConfig();
+            
+            // 创建菜单目录
+            File menuDir = new File(getDataFolder(), "menus");
+            if (!menuDir.exists()) {
+                menuDir.mkdirs();
+            }
+            
+            // 保存默认菜单
             saveResource("menus/menu.yml", false);
-            saveResource("menus/teleport.yml", false);  // 添加默认子菜单
-            saveResource("menus/shop.yml", false);      // 添加默认子菜单
+            saveResource("menus/teleport.yml", false);
+            saveResource("menus/shop.yml", false);
             
             // 加载消息配置
             saveResource("messages.yml", false);
@@ -36,7 +56,13 @@ public class GeyserMenu extends JavaPlugin {
             menuManager = new MenuManager(this);
             
             // 注册命令
-            getCommand("geysermenu").setExecutor(new MenuCommand(this));
+            if (getCommand("geysermenu") != null) {
+                getCommand("geysermenu").setExecutor(new MenuCommand(this));
+            } else {
+                getLogger().severe("命令注册失败!");
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
             
             getLogger().info("GeyserMenu v" + getDescription().getVersion() + " 已成功加载!");
         } catch (Exception e) {
@@ -57,6 +83,9 @@ public class GeyserMenu extends JavaPlugin {
             // 取消所有任务
             Bukkit.getScheduler().cancelTasks(this);
             
+            // 清除实例
+            instance = null;
+            
             getLogger().info("GeyserMenu 已卸载!");
         } catch (Exception e) {
             getLogger().severe("插件卸载时发生错误: " + e.getMessage());
@@ -64,42 +93,60 @@ public class GeyserMenu extends JavaPlugin {
         }
     }
     
-    public static GeyserMenu getInstance() {
-        return instance;
-    }
-    
-    public MenuManager getMenuManager() {
-        return menuManager;
-    }
-    
     public void reloadMessages() {
-        File messagesFile = new File(getDataFolder(), "messages.yml");
-        messages = YamlConfiguration.loadConfiguration(messagesFile);
-    }
-    
-    public String getMessage(String path) {
-        return getMessage(path, new String[0]);
+        try {
+            File messagesFile = new File(getDataFolder(), "messages.yml");
+            if (!messagesFile.exists()) {
+                saveResource("messages.yml", false);
+            }
+            messages = YamlConfiguration.loadConfiguration(messagesFile);
+        } catch (Exception e) {
+            getLogger().severe("加载消息配置时发生错误: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     public String getMessage(String path, String... args) {
-        String message = messages.getString("messages." + path);
-        if (message == null) {
-            return "§c消息未配置: " + path;
+        try {
+            String message = messages.getString("messages." + path);
+            if (message == null) {
+                return "§c消息未配置: " + path;
+            }
+            
+            // 使用StringBuilder优化字符串处理
+            StringBuilder result = new StringBuilder(getPrefix());
+            String formattedMessage = message;
+            
+            // 替换参数
+            for (int i = 0; i < args.length; i++) {
+                formattedMessage = formattedMessage.replace("{" + i + "}", args[i] != null ? args[i] : "null");
+            }
+            
+            result.append(formattedMessage);
+            return result.toString();
+        } catch (Exception e) {
+            getLogger().warning("获取消息时出错: " + path);
+            return "§c消息处理错误: " + path;
         }
-        return getPrefix() + String.format(message, (Object[]) args);
-    }
-    
-    public String getPrefix() {
-        return messages.getString("prefix", "§6[GeyserMenu] §f");
     }
     
     public String getRawMessage(String path) {
-        return messages.getString("messages." + path);
+        try {
+            return messages.getString("messages." + path, "§c消息未配置: " + path);
+        } catch (Exception e) {
+            getLogger().warning("获取原始消息时出错: " + path);
+            return "§c消息处理错误: " + path;
+        }
     }
     
     private boolean checkDependencies() {
-        return getServer().getPluginManager().getPlugin("Geyser-Spigot") != null 
-            && getServer().getPluginManager().getPlugin("floodgate") != null;
+        try {
+            return getServer().getPluginManager().getPlugin("Geyser-Spigot") != null 
+                && getServer().getPluginManager().getPlugin("floodgate") != null;
+        } catch (Exception e) {
+            getLogger().severe("检查依赖时发生错误: " + e.getMessage());
+            return false;
+        }
     }
     
     private boolean checkConfig() {
@@ -128,6 +175,30 @@ public class GeyserMenu extends JavaPlugin {
             getLogger().severe("检查配置文件时发生错误: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    // 静态方法应该检查实例是否存在
+    public static GeyserMenu getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("插件实例未初始化!");
+        }
+        return instance;
+    }
+    
+    public MenuManager getMenuManager() {
+        if (menuManager == null) {
+            throw new IllegalStateException("菜单管理器未初始化!");
+        }
+        return menuManager;
+    }
+    
+    public String getPrefix() {
+        try {
+            return messages.getString("prefix", "§6[GeyserMenu] §f");
+        } catch (Exception e) {
+            getLogger().warning("获取前缀时出错");
+            return "§6[GeyserMenu] §f";
         }
     }
 } 

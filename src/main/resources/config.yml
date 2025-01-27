@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.0.1
+# 版本: 1.0.2
 
 # 插件设置
 settings:
@@ -9,6 +9,23 @@ settings:
   
   # 调试模式
   debug: false
+  
+  # 性能设置
+  performance:
+    # 命令执行延迟（毫秒）
+    command-delay: 0
+    
+    # 是否缓存PAPI变量结果
+    cache-placeholders: false
+    
+    # 缓存刷新间隔（秒）
+    cache-refresh: 30
+    
+    # 最大缓存大小
+    max-cache-size: 1000
+    
+    # 是否在重载时清除缓存
+    clear-cache-on-reload: true
 
 # 菜单配置
 menus:
@@ -16,16 +33,20 @@ menus:
   main:
     file: "menu.yml"
     enable: true
+    # 权限节点（可选）
+    permission: "geysermenu.menu.main"
   
   # 传送菜单
   teleport:
     file: "teleport.yml"
     enable: true
+    permission: "geysermenu.menu.teleport"
   
   # 商店菜单
   shop:
     file: "shop.yml"
     enable: true
+    permission: "geysermenu.menu.shop"
   
   # 示例：禁用的菜单
   example:
@@ -42,3 +63,47 @@ icons:
   
   # 默认图标
   default: "minecraft:paper"
+  
+  # URL图标安全设置
+  url:
+    # 允许的域名列表
+    allowed-domains:
+      - "i.imgur.com"
+      - "cdn.example.com"
+    
+    # 是否只允许HTTPS
+    https-only: true
+    
+    # 最大URL长度
+    max-length: 256
+
+# 安全设置
+security:
+  # 命令黑名单
+  blocked-commands:
+    - "op"
+    - "deop"
+    - "stop"
+    - "reload"
+    
+  # 是否允许执行含有特殊字符的命令
+  allow-special-chars: false
+  
+  # 是否检查文件路径安全性
+  check-file-path: true
+
+permissions:
+  geysermenu.menu.*:
+    description: 允许使用所有菜单
+    default: op
+    children:
+      geysermenu.menu.main: true
+      geysermenu.menu.teleport: true
+      geysermenu.menu.shop: true
+
+messages:
+  error:
+    no-menu-permission: "§c你没有权限使用此菜单!"
+    invalid-menu: "§c无效的菜单配置!"
+    url-blocked: "§c此图标URL已被禁用!"
+    command-blocked: "§c此命令已被禁用!"

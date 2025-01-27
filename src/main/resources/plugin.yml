@@ -1,8 +1,8 @@
 name: GeyserMenu
-version: '1.0.1'
+version: '1.0.2'
 main: cn.ningmo.geysermenu.GeyserMenu
 author: 柠枺
-api-version: 1.13
+api-version: '1.21'
 depend: [Geyser-Spigot, floodgate]
 softdepend: [PlaceholderAPI]
 description: 一个轻量化且简单的基岩版自定义表单插件
