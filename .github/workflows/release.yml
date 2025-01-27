@@ -10,25 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: 'maven'
-          
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v1
+          cache: maven
       
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-      
-      - name: Run tests
-        run: mvn test
       
       - name: Get version
         id: get_version
@@ -39,8 +32,10 @@ jobs:
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -z "$PREVIOUS_TAG" ]; then
+            # 如果没有之前的tag，获取所有提交信息
             COMMITS=$(git log --pretty=format:"- %s" --no-merges)
           else
+            # 获取从上一个tag到现在的提交信息
             COMMITS=$(git log --pretty=format:"- %s" --no-merges $PREVIOUS_TAG..HEAD)
           fi
           echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
@@ -54,22 +49,5 @@ jobs:
           body: |
             ## 更新内容
             ${{ steps.get_commits.outputs.COMMITS }}
-            
-            ## 支持版本
-            - Minecraft: 1.20+
-            - Java: 21+
-            
-            ## 安装说明
-            1. 确保服务器已安装 Geyser 和 Floodgate
-            2. 将插件放入 plugins 文件夹
-            3. 重启服务器
           files: |
-            target/geysermenu-*.jar
-          draft: false
-          prerelease: false
-          
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Package
-          path: target/geysermenu-*.jar 
+            target/geysermenu-*.jar 
