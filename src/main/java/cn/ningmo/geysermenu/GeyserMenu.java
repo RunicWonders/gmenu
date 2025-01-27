@@ -1,7 +1,6 @@
 package cn.ningmo.geysermenu;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.geysermc.floodgate.api.FloodgateApi;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import org.bukkit.Bukkit;
@@ -87,13 +86,7 @@ public class GeyserMenu extends JavaPlugin {
         if (message == null) {
             return "§c消息未配置: " + path;
         }
-        
-        // 替换参数
-        for (int i = 0; i < args.length; i++) {
-            message = message.replace("{" + i + "}", args[i]);
-        }
-        
-        return getPrefix() + message;
+        return getPrefix() + String.format(message, (Object[]) args);
     }
     
     public String getPrefix() {
