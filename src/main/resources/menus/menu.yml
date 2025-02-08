@@ -25,6 +25,11 @@ menu:
     
     - text: "§c自定义图标"
       description: "使用自定义路径的图标"
+      # icon是必须的，否则URL或path无效
       icon: "stone"
+      #可用类型为URL或path
       icon_type: "path"
-      icon_path: "plugins/GeyserMenu/icons/example.png"
+      #定义图标路径
+      #URL模式可以用一下内容
+      #icon_url: "https://i.imgur.com/example.png"
+      icon_path: "plugins/GeyserMenu/icons/icon.png"
