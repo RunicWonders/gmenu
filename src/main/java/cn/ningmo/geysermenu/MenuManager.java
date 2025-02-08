@@ -256,7 +256,7 @@ public class MenuManager {
         // 检查命令黑名单
         List<String> blockedCommands = plugin.getConfig().getStringList("security.blocked-commands");
         for (String blocked : blockedCommands) {
-            if (command.toLowerCase().contains(blocked.toLowerCase())) {
+            if (command.trim().equalsIgnoreCase(blocked.trim())) {
                 return false;
             }
         }
@@ -411,4 +411,4 @@ public class MenuManager {
     public List<String> getMenuList() {
         return new ArrayList<>(menus.keySet());
     }
-} 
+}
