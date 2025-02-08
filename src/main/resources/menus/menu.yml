@@ -21,4 +21,10 @@ menu:
       description: "点击立即返回主城出生点"
       icon: "minecraft:nether_star"
       command: "spawn"
-      execute_as: "player" 
+      execute_as: "player"
+    
+    - text: "§c自定义图标"
+      description: "使用自定义路径的图标"
+      icon: "stone"
+      icon_type: "path"
+      icon_path: "plugins/GeyserMenu/icons/example.png"

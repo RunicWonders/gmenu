@@ -252,11 +252,16 @@ public class MenuManager {
     // 检查命令安全性
     private boolean isCommandSafe(String command) {
         if (command == null) return false;
+
+        // 检查是否启用命令安全检查
+        if (!plugin.getConfig().getBoolean("settings.enable-command-security", true)) {
+            return true;
+        }
         
         // 检查命令黑名单
         List<String> blockedCommands = plugin.getConfig().getStringList("security.blocked-commands");
         for (String blocked : blockedCommands) {
-            if (command.toLowerCase().contains(blocked.toLowerCase())) {
+            if (command.trim().equalsIgnoreCase(blocked.trim())) {
                 return false;
             }
         }
@@ -411,4 +416,4 @@ public class MenuManager {
     public List<String> getMenuList() {
         return new ArrayList<>(menus.keySet());
     }
-} 
+}

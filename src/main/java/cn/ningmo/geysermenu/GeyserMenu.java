@@ -36,6 +36,11 @@ public class GeyserMenu extends JavaPlugin {
             
             // 保存默认配置
             saveDefaultConfig();
+
+            // 添加新的配置项到配置文件中
+            getConfig().addDefault("settings.enable-command-security", true);
+            getConfig().options().copyDefaults(true);
+            saveConfig();
             
             // 创建菜单目录
             File menuDir = new File(getDataFolder(), "menus");
@@ -201,4 +206,4 @@ public class GeyserMenu extends JavaPlugin {
             return "§6[GeyserMenu] §f";
         }
     }
-} 
+}
