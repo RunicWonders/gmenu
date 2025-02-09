@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.0.4
+# 版本: 1.0.5
 
 # 插件设置
 settings:
@@ -79,6 +79,17 @@ icons:
     
     # 最大URL长度
     max-length: 256
+
+  # 图标加载设置
+  loading:
+    # 连接超时时间(毫秒)
+    connect-timeout: 5000
+    # 读取超时时间(毫秒)
+    read-timeout: 5000
+    # 是否缓存Base64图标
+    enable-cache: true
+    # 缓存过期时间(分钟)
+    cache-expire: 30
 
 # 安全设置
 security:
