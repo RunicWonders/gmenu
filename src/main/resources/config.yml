@@ -1,51 +1,53 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.0.4
+# 版本: 1.0.5
 
-# 插件设置
+# 插件基础设置
 settings:
-  # 默认菜单文件名
+  # 默认菜单文件名 - 当玩家直接使用/gmenu时打开的菜单
   default-menu: "menu.yml"
   
-  # 调试模式
+  # 调试模式 - 启用后会输出更多日志信息
   debug: false
   
-  # 性能设置
+  # 性能优化设置
   performance:
-    # 命令执行延迟（毫秒）
+    # 命令执行延迟（毫秒）- 防止命令执行过快导致服务器卡顿
     command-delay: 0
     
-    # 是否缓存PAPI变量结果
+    # 是否缓存PAPI变量结果 - 可以提高性能，但变量更新会有延迟
     cache-placeholders: false
     
-    # 缓存刷新间隔（秒）
+    # 缓存刷新间隔（秒）- 仅在启用变量缓存时生效
     cache-refresh: 30
     
-    # 最大缓存大小
+    # 最大缓存数量 - 防止缓存占用过多内存
     max-cache-size: 1000
     
     # 是否在重载时清除缓存
     clear-cache-on-reload: true
     
-  # 是否启用命令安全检查
+  # 命令安全检查 - 防止执行危险命令
   enable-command-security: true
 
-# 菜单配置
+# 菜单配置 - 在这里定义所有可用的菜单
 menus:
-  # 主菜单
+  # 主菜单配置
   main:
+    # 菜单文件名
     file: "menu.yml"
+    # 是否启用此菜单
     enable: true
-    # 权限节点（可选）
+    # 使用此菜单需要的权限（可选）
     permission: "geysermenu.menu.main"
   
-  # 传送菜单
+  # 传送菜单配置
   teleport:
     file: "teleport.yml"
     enable: true
     permission: "geysermenu.menu.teleport"
   
-  # 商店菜单
+  # 商店菜单配置
   shop:
     file: "shop.yml"
     enable: true
@@ -58,43 +60,55 @@ menus:
 
 # 图标设置
 icons:
-  # 自定义图标目录
+  # 自定义图标存放目录
   custom_path: "plugins/GeyserMenu/icons"
   
-  # 是否允许URL图标
+  # 是否允许使用网络图片作为图标
   allow_url: true
   
-  # 默认图标
+  # 默认图标 - 当图标加载失败时使用
   default: "minecraft:paper"
   
-  # URL图标安全设置
+  # 网络图标安全设置
   url:
-    # 允许的域名列表
+    # 允许加载图标的域名白名单
     allowed-domains:
       - "i.imgur.com"
       - "cdn.example.com"
     
-    # 是否只允许HTTPS
+    # 是否只允许HTTPS链接
     https-only: true
     
-    # 最大URL长度
+    # 图标URL最大长度限制
     max-length: 256
+
+  # 图标加载设置
+  loading:
+    # 连接超时时间(毫秒)
+    connect-timeout: 5000
+    # 读取超时时间(毫秒)
+    read-timeout: 5000
+    # 是否缓存Base64编码的图标
+    enable-cache: true
+    # 图标缓存过期时间(分钟)
+    cache-expire: 30
 
 # 安全设置
 security:
-  # 命令黑名单
+  # 禁止执行的命令列表
   blocked-commands:
     - "op"
     - "deop"
     - "stop"
     - "reload"
     
-  # 是否允许执行含有特殊字符的命令
+  # 是否允许命令中包含特殊字符(如 & | ; 等)
   allow-special-chars: false
   
-  # 是否检查文件路径安全性
+  # 是否检查文件路径安全性 - 防止目录遍历攻击
   check-file-path: true
 
+# 权限节点配置
 permissions:
   geysermenu.menu.*:
     description: 允许使用所有菜单
@@ -104,6 +118,7 @@ permissions:
       geysermenu.menu.teleport: true
       geysermenu.menu.shop: true
 
+# 错误消息配置
 messages:
   error:
     no-menu-permission: "§c你没有权限使用此菜单!"

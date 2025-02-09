@@ -193,61 +193,57 @@ public class MenuManager {
                 
                 // 处理图标
                 if (icon != null && !icon.isEmpty()) {
-                    if (iconType != null && iconType.equalsIgnoreCase("url")) {
-                        // 移除HTTPS和域名校验
-                        // if (isValidIconUrl(icon)) {
-                        if (icon.length() <= plugin.getConfig().getInt("icons.url.max-length", 256)) {
-                            plugin.getLogger().info("加载URL图标: " + icon);
-                            // 使用Base64编码
-                            // form.button(text, FormImage.Type.URL, icon);
-                            // 尝试将URL图片转换为Base64
-                            String base64Icon = null;
-                            // 尝试将URL图片转换为Base64
-                            try {
-                                // 创建一个URL对象
-                                java.net.URL url = new java.net.URL(icon);
-                                // 打开连接
-                                java.net.URLConnection connection = url.openConnection();
-                                // 设置超时时间
-                                connection.setConnectTimeout(5000);
-                                connection.setReadTimeout(5000);
-                                // 获取输入流
-                                java.io.InputStream inputStream = connection.getInputStream();
-                                // 将输入流转换为byte数组
-                                byte[] imageBytes = IOUtils.toByteArray(inputStream);
-                                // 对byte数组进行Base64编码
-                                base64Icon = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
-                                inputStream.close();
-                            } catch (Exception e) {
-                                plugin.getLogger().warning("加载URL图片失败: " + icon + " - " + e.getMessage());
+                    String finalText = text;
+                    if (iconType != null) {
+                        switch (iconType.toLowerCase()) {
+                            case "url" -> {
+                                // 处理URL图标
+                                if (icon.length() <= plugin.getConfig().getInt("icons.url.max-length", 256)) {
+                                    try {
+                                        String base64Icon = fetchAndConvertIcon(icon);
+                                        if (base64Icon != null) {
+                                            form.button(finalText, FormImage.Type.URL, base64Icon);
+                                        } else {
+                                            form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
+                                        }
+                                    } catch (Exception e) {
+                                        plugin.getLogger().warning("加载URL图标失败: " + icon);
+                                        form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
+                                    }
+                                } else {
+                                    plugin.getLogger().warning("图标URL超出长度限制: " + icon);
+                                    form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
+                                }
                             }
-                            if (base64Icon != null) {
-                                form.button(text, FormImage.Type.URL, base64Icon);
-                            } else {
-                                form.button(text);
+                            case "path" -> {
+                                // 处理本地路径图标
+                                if (iconPath != null) {
+                                    File iconFile = new File(plugin.getDataFolder(), iconPath);
+                                    if (iconFile.exists()) {
+                                        try {
+                                            String base64Icon = imageToBase64(iconFile.getAbsolutePath());
+                                            if (base64Icon != null) {
+                                                form.button(finalText, FormImage.Type.URL, base64Icon);
+                                            } else {
+                                                form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
+                                            }
+                                        } catch (Exception e) {
+                                            plugin.getLogger().warning("加载本地图标失败: " + iconPath);
+                                            form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
+                                        }
+                                    } else {
+                                        plugin.getLogger().warning("图标文件不存在: " + iconPath);
+                                        form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
+                                    }
+                                } else {
+                                    form.button(finalText, FormImage.Type.PATH, "textures/items/" + icon);
+                                }
                             }
-                        } else {
-                            plugin.getLogger().warning("检测到不安全的图标URL: " + icon);
-                            form.button(text);
-                        }
-                    } else if (iconType != null && iconType.equalsIgnoreCase("path") && iconPath != null) {
-                        File iconFile = new File(plugin.getDataFolder(), iconPath);
-                        if (iconFile.exists()) {
-                            plugin.getLogger().info("加载自定义路径图标: " + iconPath);
-                            // 使用Base64编码
-                            // form.button(text, FormImage.Type.PATH, iconPath);
-                            String base64Icon = imageToBase64(iconFile.getAbsolutePath());
-                            if (base64Icon != null) {
-                                form.button(text, FormImage.Type.URL, base64Icon);
-                            } else {
-                                form.button(text);
-                            }
-                        } else {
-                            plugin.getLogger().warning("自定义路径图标不存在: " + iconPath);
-                            form.button(text);
+                            default -> form.button(finalText, FormImage.Type.PATH, formatMinecraftIcon(icon));
                         }
                     } else {
-                        form.button(text);
+                        // 默认使用 minecraft 材质路径
+                        form.button(finalText, FormImage.Type.PATH, formatMinecraftIcon(icon));
                     }
                 } else {
                     form.button(text);
@@ -471,8 +467,7 @@ public class MenuManager {
             File imageFile = new File(imagePath);
             String mimeType = Files.probeContentType(imageFile.toPath());
             if (mimeType == null) {
-                plugin.getLogger().warning("无法确定图片类型: " + imagePath);
-                return null;
+                mimeType = "image/png";
             }
 
             byte[] fileContent = Files.readAllBytes(imageFile.toPath());
@@ -482,6 +477,63 @@ public class MenuManager {
             return null;
         }
     }
+
+    // 添加新的辅助方法
+    private String getDefaultIcon() {
+        return plugin.getConfig().getString("icons.default", "paper");
+    }
+
+    private String fetchAndConvertIcon(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            
+            try (InputStream inputStream = connection.getInputStream()) {
+                byte[] imageBytes = IOUtils.toByteArray(inputStream);
+                String mimeType = connection.getContentType();
+                if (mimeType == null) {
+                    mimeType = "image/png";
+                }
+                return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("获取URL图标失败: " + urlString + " - " + e.getMessage());
+            return null;
+        }
+    }
+
+    // 添加新的辅助方法
+    private String formatMinecraftIcon(String icon) {
+        if (icon == null || icon.isEmpty()) {
+            return "textures/items/" + getDefaultIcon();
+        }
+        
+        // 如果已经包含完整路径，直接返回
+        if (icon.startsWith("textures/")) {
+            return icon;
+        }
+        
+        // 移除 minecraft: 前缀
+        icon = icon.replace("minecraft:", "");
+        
+        // 处理特殊方块
+        if (icon.endsWith("_block")) {
+            return "textures/blocks/" + icon;
+        }
+        
+        // 处理特殊物品
+        switch (icon.toLowerCase()) {
+            case "grass":
+            case "stone":
+            case "dirt":
+                return "textures/blocks/" + icon;
+            default:
+                return "textures/items/" + icon;
+        }
+    }
+
     /**
      * 获取所有已启用的菜单名称
      * @return 菜单名称列表

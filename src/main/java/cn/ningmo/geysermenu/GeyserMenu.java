@@ -113,12 +113,11 @@ public class GeyserMenu extends JavaPlugin {
     
     public String getMessage(String path, String... args) {
         try {
-            String message = messages.getString("messages." + path);
+            String message = messages.getString(path);
             if (message == null) {
                 return "§c消息未配置: " + path;
             }
             
-            // 使用StringBuilder优化字符串处理
             StringBuilder result = new StringBuilder(getPrefix());
             String formattedMessage = message;
             
@@ -137,7 +136,7 @@ public class GeyserMenu extends JavaPlugin {
     
     public String getRawMessage(String path) {
         try {
-            return messages.getString("messages." + path, "§c消息未配置: " + path);
+            return messages.getString(path, "§c消息未配置: " + path);
         } catch (Exception e) {
             getLogger().warning("获取原始消息时出错: " + path);
             return "§c消息处理错误: " + path;
