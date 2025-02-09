@@ -1,4 +1,4 @@
-# GeyserMenu
+# GeyserMenu v1.0.8
 
 一个轻量化且简单的基岩版自定义表单插件。
 

@@ -9,14 +9,17 @@ reload:
 error:
   no-permission: "§c你没有权限执行此命令!"
   player-only: "§c此命令只能由玩家执行!"
-  bedrock-only: "§c此命令仅支持基岩版玩家使用!"
-  menu-not-found: "§c未找到指定的菜单配置!"
-  menu-format-error: "§c菜单配置格式错误!"
+  bedrock-only: "§c此功能仅支持基岩版玩家使用!"
+  menu-not-found: "§c找不到指定的菜单!"
+  menu-format-error: "§c菜单格式错误!"
   player-not-found: "§c找不到玩家: {0}"
-  command-error: "§c执行命令时出错!"
+  command-error: "§c执行命令时出错，请联系管理员!"
   form-error: "§c打开菜单时出错，请联系管理员!"
   placeholder-error: "§c处理变量时出错!"
   unknown-command: "§c未知的命令，使用 /gmenu help 查看帮助"
+  no-menu-permission: "§c你没有权限使用此菜单!"
+  url-blocked: "§c此图标URL已被禁用!"
+  command-blocked: "§c此命令已被禁用!"
 
 command:
   usage: "§c用法: {0}"

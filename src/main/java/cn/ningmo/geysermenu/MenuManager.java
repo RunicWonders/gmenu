@@ -203,17 +203,23 @@ public class MenuManager {
 
             // 发送表单
             form.responseHandler((form1, response) -> {
-                if (response == null) return;  // 玩家关闭表单
+                if (response == null || response.isEmpty()) return;  // 玩家关闭表单
                 
-                int clickedButton = Integer.parseInt(response);  // SimpleForm 的响应直接就是按钮索引
-                if (clickedButton >= 0 && clickedButton < actions.size()) {
-                    MenuAction action = actions.get(clickedButton);
-                    if (action.submenu() != null) {
-                        // 打开子菜单
-                        openMenu(player, action.submenu());
-                    } else if (action.command() != null) {
-                        // 执行命令
-                        executeCommand(player, action.command(), action.executeAs());
+                try {
+                    int clickedButton = Integer.parseInt(response);  // SimpleForm 的响应直接就是按钮索引
+                    if (clickedButton >= 0 && clickedButton < actions.size()) {
+                        MenuAction action = actions.get(clickedButton);
+                        if (action.submenu() != null) {
+                            // 打开子菜单
+                            openMenu(player, action.submenu());
+                        } else if (action.command() != null) {
+                            // 执行命令
+                            executeCommand(player, action.command(), action.executeAs());
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                        plugin.getLogger().warning("处理表单响应时出错: " + e.getMessage());
                     }
                 }
             });

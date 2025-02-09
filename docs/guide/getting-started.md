@@ -20,11 +20,16 @@
 plugins/GeyserMenu/
 ├── config.yml      # 主配置文件
 ├── messages.yml    # 消息配置文件
+├── icons/          # 自定义图标目录
 └── menus/          # 菜单文件夹
     ├── menu.yml    # 主菜单
     ├── shop.yml    # 商店菜单
     └── teleport.yml # 传送菜单
 ```
+
+::: tip 提示
+配置文件只会在首次启动时生成，之后的修改不会被覆盖。
+:::
 
 ### 基础配置
 

@@ -150,4 +150,16 @@ icon_path: "plugins/GeyserMenu/icons/custom.png"
 icon: "stone"  # 基础图标（必需）
 icon_type: "url"
 icon_url: "https://example.com/icon.png"
-``` 
+```
+
+## 配置保存
+
+配置文件的保存和重载机制：
+
+1. 首次启动时会生成所有默认配置文件
+2. 之后修改配置文件不会被覆盖
+3. 使用 `/gmenu reload` 重载时会保留修改
+
+::: warning 注意
+不要在服务器运行时直接删除配置文件，这可能导致插件无法正常工作。
+::: 

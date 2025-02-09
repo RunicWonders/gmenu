@@ -36,7 +36,13 @@ public class GeyserMenu extends JavaPlugin {
             
             // 保存默认配置
             saveDefaultConfig();
-
+            
+            // 保存其他配置文件
+            saveResource("messages.yml", false);
+            saveResource("menus/menu.yml", false);
+            saveResource("menus/shop.yml", false);
+            saveResource("menus/teleport.yml", false);
+            
             // 添加新的配置项到配置文件中
             getConfig().addDefault("settings.enable-command-security", true);
             getConfig().options().copyDefaults(true);
@@ -60,7 +66,6 @@ public class GeyserMenu extends JavaPlugin {
             }
             
             // 加载消息配置
-            saveResource("messages.yml", false);
             reloadMessages();
             
             // 初始化菜单管理器
@@ -187,6 +192,20 @@ public class GeyserMenu extends JavaPlugin {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        
+        // 重新加载消息配置
+        File messagesFile = new File(getDataFolder(), "messages.yml");
+        if (messagesFile.exists()) {
+            messages = YamlConfiguration.loadConfiguration(messagesFile);
+        }
+        
+        // 重新加载菜单
+        menuManager.loadMenus();
     }
     
     // 静态方法应该检查实例是否存在
