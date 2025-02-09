@@ -9,17 +9,17 @@ menu:
   items:
     - text: "§c返回上级菜单"
       description: "返回到主菜单"
-      icon: "minecraft:arrow"
+      icon: "arrow"
       submenu: "menu.yml"
     
     - text: "§e方块商店"
       description: "购买各种建筑方块"
-      icon: "minecraft:grass_block"
+      icon: "grass_block"
       command: "shop blocks"
       execute_as: "player"
     
     - text: "§b物品商店"
       description: "购买各种特殊物品"
-      icon: "minecraft:diamond"
+      icon: "diamond"
       command: "shop items"
       execute_as: "player" 

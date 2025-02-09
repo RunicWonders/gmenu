@@ -45,4 +45,4 @@ menus:
     permission: "geysermenu.menu.shop"
 ```
 
-所有菜单权限会自动成为 `geysermenu.menu.*` 的子权限。拥有 `geysermenu.menu.*` 权限的玩家可以使用所有已启用的菜单。 
+所有菜单权限会自动成为 `geysermenu.menu.*` 的子权限。拥有 `geysermenu.menu.*` 权限的玩家可以使用所有已启用的菜单。

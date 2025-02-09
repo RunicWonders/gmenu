@@ -53,6 +53,12 @@ public class GeyserMenu extends JavaPlugin {
             saveResource("menus/teleport.yml", false);
             saveResource("menus/shop.yml", false);
             
+            // 创建图标目录
+            File iconDir = new File(getDataFolder(), "icons");
+            if (!iconDir.exists()) {
+                iconDir.mkdirs();
+            }
+            
             // 加载消息配置
             saveResource("messages.yml", false);
             reloadMessages();

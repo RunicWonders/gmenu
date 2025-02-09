@@ -14,15 +14,16 @@
 
 ## 配置
 
-插件首次运行会生成以下文件： 
+插件首次运行会生成以下文件：
+
 ```text
 plugins/GeyserMenu/
-├── config.yml # 主配置文件
-├── messages.yml # 消息配置文件
-└── menus/ # 菜单文件夹
-├── menu.yml # 主菜单
-├── shop.yml # 商店菜单
-└── teleport.yml # 传送菜单
+├── config.yml      # 主配置文件
+├── messages.yml    # 消息配置文件
+└── menus/          # 菜单文件夹
+    ├── menu.yml    # 主菜单
+    ├── shop.yml    # 商店菜单
+    └── teleport.yml # 传送菜单
 ```
 
 ### 基础配置
@@ -47,7 +48,7 @@ menu:
   items:
     - text: "测试按钮"
       description: "点击执行命令"
-      icon: "diamond"
+      icon: "diamond"  # 不需要 minecraft: 前缀
       command: "say 你好"
 ```
 

@@ -104,6 +104,13 @@ public class MenuManager {
                 player.sendMessage(plugin.getMessage("error.bedrock-only"));
                 return;
             }
+
+            // 权限检查
+            String permission = plugin.getConfig().getString("menus." + menuName.replace(".yml", "") + ".permission");
+            if (permission != null && !player.hasPermission(permission)) {
+                player.sendMessage(plugin.getMessage("error.no-menu-permission"));
+                return;
+            }
             
             // 菜单检查
             YamlConfiguration menuConfig = menus.get(menuName);
@@ -125,166 +132,96 @@ public class MenuManager {
                 return;
             }
 
-            // 处理菜单内容
-            String title = parsePlaceholders(player, menuSection.getString("title", "菜单"));
-            String subtitle = parsePlaceholders(player, menuSection.getString("subtitle", ""));
-            String content = parsePlaceholders(player, menuSection.getString("content", ""));
-            String footer = parsePlaceholders(player, menuSection.getString("footer", ""));
-            
-            // 创建表单
+            // 构建表单
             SimpleForm.Builder form = SimpleForm.builder()
-                .title(title);
-                
-            // 创建表单内容
-            StringBuilder contentBuilder = new StringBuilder();
+                .title(parsePlaceholders(player, menuSection.getString("title", "菜单")));
+
+            // 处理内容
+            StringBuilder content = new StringBuilder();
             
             // 添加副标题
+            String subtitle = parsePlaceholders(player, menuSection.getString("subtitle", ""));
             if (!subtitle.isEmpty()) {
-                contentBuilder.append(subtitle).append("\n\n");
+                content.append(subtitle).append("\n\n");
             }
             
-            // 添加内容
-            if (!content.isEmpty()) {
-                contentBuilder.append(content);
-                // 如果内容不是以换行结束，添加换行
-                if (!content.endsWith("\n")) {
-                    contentBuilder.append("\n");
+            // 添加主要内容
+            String mainContent = parsePlaceholders(player, menuSection.getString("content", ""));
+            if (!mainContent.isEmpty()) {
+                content.append(mainContent);
+                if (!mainContent.endsWith("\n")) {
+                    content.append("\n");
                 }
             }
             
             // 添加页脚
+            String footer = parsePlaceholders(player, menuSection.getString("footer", ""));
             if (!footer.isEmpty()) {
-                // 如果已有内容，确保有足够的间距
-                if (contentBuilder.length() > 0) {
-                    contentBuilder.append("\n");
+                if (content.length() > 0) {
+                    content.append("\n");
                 }
-                contentBuilder.append(footer);
+                content.append(footer);
             }
-            
+
             // 设置表单内容
-            if (contentBuilder.length() > 0) {
-                form.content(contentBuilder.toString());
+            if (content.length() > 0) {
+                form.content(content.toString());
             }
-            
-            List<Map<?, ?>> items = menuSection.getMapList("items");
-            if (items == null) {
-                items = new ArrayList<>();
-            }
-            final Map<Integer, MenuAction> actionMap = new HashMap<>();
-            
-            for (int i = 0; i < items.size(); i++) {
-                Map<?, ?> item = items.get(i);
-                if (item == null) continue;
 
-                // 安全获取值
-                String text = parsePlaceholders(player, getString(item, "text", "未命名按钮"));
-                String description = parsePlaceholders(player, getString(item, "description", ""));
-                String icon = getString(item, "icon", null);
-                String iconType = getString(item, "icon_type", null);
-                String iconPath = getString(item, "icon_path", null);
-                String command = getString(item, "command", null);
-                String executeAs = getString(item, "execute_as", "player");
-                String submenu = getString(item, "submenu", null);
-                
-                // 如果有描述，添加到按钮文本中
-                if (description != null && !description.isEmpty()) {
-                    text = text + "\n§7" + description;
-                }
-                
-                // 处理图标
-                if (icon != null && !icon.isEmpty()) {
-                    String finalText = text;
-                    if (iconType != null) {
-                        switch (iconType.toLowerCase()) {
-                            case "url" -> {
-                                // 处理URL图标
-                                if (icon.length() <= plugin.getConfig().getInt("icons.url.max-length", 256)) {
-                                    try {
-                                        String base64Icon = fetchAndConvertIcon(icon);
-                                        if (base64Icon != null) {
-                                            form.button(finalText, FormImage.Type.URL, base64Icon);
-                                        } else {
-                                            form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
-                                        }
-                                    } catch (Exception e) {
-                                        plugin.getLogger().warning("加载URL图标失败: " + icon);
-                                        form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
-                                    }
-                                } else {
-                                    plugin.getLogger().warning("图标URL超出长度限制: " + icon);
-                                    form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
-                                }
-                            }
-                            case "path" -> {
-                                // 处理本地路径图标
-                                if (iconPath != null) {
-                                    File iconFile = new File(plugin.getDataFolder(), iconPath);
-                                    if (iconFile.exists()) {
-                                        try {
-                                            String base64Icon = imageToBase64(iconFile.getAbsolutePath());
-                                            if (base64Icon != null) {
-                                                form.button(finalText, FormImage.Type.URL, base64Icon);
-                                            } else {
-                                                form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
-                                            }
-                                        } catch (Exception e) {
-                                            plugin.getLogger().warning("加载本地图标失败: " + iconPath);
-                                            form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
-                                        }
-                                    } else {
-                                        plugin.getLogger().warning("图标文件不存在: " + iconPath);
-                                        form.button(finalText, FormImage.Type.PATH, "textures/items/" + getDefaultIcon());
-                                    }
-                                } else {
-                                    form.button(finalText, FormImage.Type.PATH, "textures/items/" + icon);
-                                }
-                            }
-                            default -> form.button(finalText, FormImage.Type.PATH, formatMinecraftIcon(icon));
-                        }
+            // 处理按钮
+            List<MenuAction> actions = new ArrayList<>();
+            ConfigurationSection items = menuSection.getConfigurationSection("items");
+            if (items != null) {
+                for (String key : items.getKeys(false)) {
+                    ConfigurationSection item = items.getConfigurationSection(key);
+                    if (item == null) continue;
+
+                    // 处理按钮文本和图标
+                    String text = parsePlaceholders(player, item.getString("text", "未命名"));
+                    String description = parsePlaceholders(player, item.getString("description", ""));
+                    
+                    // 处理图标
+                    String icon = item.getString("icon");
+                    String iconType = item.getString("icon_type");
+                    String iconPath = item.getString("icon_path");
+                    FormImage formImage = processIcon(icon, iconType, iconPath);
+
+                    // 添加按钮
+                    if (!description.isEmpty()) {
+                        form.button(text + "\n" + description, formImage);
                     } else {
-                        // 默认使用 minecraft 材质路径
-                        form.button(finalText, FormImage.Type.PATH, formatMinecraftIcon(icon));
+                        form.button(text, formImage);
                     }
-                } else {
-                    form.button(text);
+
+                    // 记录动作
+                    String command = item.getString("command");
+                    String executeAs = item.getString("execute_as", "player");
+                    String submenu = item.getString("submenu");
+                    actions.add(new MenuAction(command, executeAs, submenu));
                 }
-                // 创建菜单动作
-                MenuAction action = new MenuAction(command, executeAs);
-                actionMap.put(i, action);
             }
 
-            List<Map<?, ?>> finalItems = items;
+            // 发送表单
             form.responseHandler((form1, responseData) -> {
-                SimpleFormResponse response = form1.parseResponse(responseData);
-                if (response.getClickedButtonId() >= 0) {
-                    MenuAction action = actionMap.get(response.getClickedButtonId());
-                    if (action != null) {
-                        if (actionMap.get(response.getClickedButtonId()) != null && finalItems.get(response.getClickedButtonId()) != null) {
-                            Map<?, ?> item = finalItems.get(response.getClickedButtonId());
-                            String command = getString(item, "command", null);
-                            String executeAs = getString(item, "execute_as", "player");
-                            String submenu = getString(item, "submenu", null);
-                            if (submenu != null) {
-                                // 打开子菜单
-                                openMenu(player, submenu);
-                            } else if (command != null) {
-                                // 执行命令
-                                executeCommand(player, command, executeAs);
-                            }
-                        }
+                if (!responseData.isCorrect()) return;
+                
+                int clickedButton = responseData.getClickedButtonId();
+                if (clickedButton >= 0 && clickedButton < actions.size()) {
+                    MenuAction action = actions.get(clickedButton);
+                    if (action.submenu() != null) {
+                        // 打开子菜单
+                        openMenu(player, action.submenu());
+                    } else if (action.command() != null) {
+                        // 执行命令
+                        executeCommand(player, action.command(), action.executeAs());
                     }
                 }
             });
-            
-            // 错误处理
-            try {
-                floodgatePlayer.sendForm(form.build());
-            } catch (Exception e) {
-                plugin.getLogger().warning("发送表单时出错: " + e.getMessage());
-                player.sendMessage(plugin.getMessage("error.form-error"));
-            }
+
+            floodgatePlayer.sendForm(form);
+
         } catch (Exception e) {
-            plugin.getLogger().severe("打开菜单时发生错误: " + e.getMessage());
+            plugin.getLogger().severe("打开菜单时出错: " + e.getMessage());
             e.printStackTrace();
             player.sendMessage(plugin.getMessage("error.form-error"));
         }
@@ -369,34 +306,17 @@ public class MenuManager {
 
     // 处理PAPI变量缓存
     private String parsePlaceholders(Player player, String text) {
-        if (text == null) return "";
-        
         try {
-            // 处理换行符
-            text = text.replace("\\n", "\n");
+            if (text == null) return "";
+            
+            // 检查是否启用了变量缓存
+            if (plugin.getConfig().getBoolean("settings.performance.cache-placeholders", false)) {
+                return parsePlaceholdersWithCache(player, text);
+            }
             
             // 处理PAPI变量
             if (text.contains("%") && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                if (plugin.getConfig().getBoolean("settings.performance.cache-placeholders", false)) {
-                    // 检查缓存是否需要刷新
-                    long now = System.currentTimeMillis();
-                    long cacheTime = plugin.getConfig().getInt("settings.performance.cache-refresh", 30) * 1000L;
-                    if (now - lastCacheRefresh > cacheTime) {
-                        placeholderCache.clear();
-                        lastCacheRefresh = now;
-                    }
-                    
-                    // 使用缓存
-                    String cacheKey = player.getName() + ":" + text;
-                    String cached = placeholderCache.get(cacheKey);
-                    if (cached == null) {
-                        cached = PlaceholderAPI.setPlaceholders(player, text);
-                        placeholderCache.put(cacheKey, cached);
-                    }
-                    text = cached;
-                } else {
-                    text = PlaceholderAPI.setPlaceholders(player, text);
-                }
+                text = PlaceholderAPI.setPlaceholders(player, text);
             }
             
             // 处理颜色代码
@@ -404,6 +324,38 @@ public class MenuManager {
         } catch (Exception e) {
             plugin.getLogger().warning("处理变量时出错: " + e.getMessage());
             return text;
+        }
+    }
+    
+    private String parsePlaceholdersWithCache(Player player, String text) {
+        try {
+            String cacheKey = player.getName() + ":" + text;
+            
+            // 检查缓存是否需要刷新
+            long now = System.currentTimeMillis();
+            long cacheTime = plugin.getConfig().getInt("settings.performance.cache-refresh", 30) * 1000L;
+            if (now - lastCacheRefresh > cacheTime) {
+                placeholderCache.clear();
+                lastCacheRefresh = now;
+            }
+            
+            // 检查缓存大小限制
+            int maxSize = plugin.getConfig().getInt("settings.performance.max-cache-size", 1000);
+            if (placeholderCache.size() >= maxSize) {
+                placeholderCache.clear();
+            }
+            
+            // 使用缓存
+            return placeholderCache.computeIfAbsent(cacheKey, k -> {
+                String processed = text;
+                if (processed.contains("%") && Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+                    processed = PlaceholderAPI.setPlaceholders(player, processed);
+                }
+                return processed.replace("&", "§");
+            });
+        } catch (Exception e) {
+            plugin.getLogger().warning("处理缓存变量时出错: " + e.getMessage());
+            return text.replace("&", "§");
         }
     }
     
@@ -458,24 +410,158 @@ public class MenuManager {
     // 使用Record替换内部类
     private record MenuAction(
         String command,
-        String executeAs
+        String executeAs,
+        String submenu
     ) {}
 
     // 将图片转换为Base64编码
     private String imageToBase64(String imagePath) {
         try {
-            File imageFile = new File(imagePath);
-            String mimeType = Files.probeContentType(imageFile.toPath());
-            if (mimeType == null) {
-                mimeType = "image/png";
+            // 检查路径是否为空
+            if (imagePath == null || imagePath.trim().isEmpty()) {
+                plugin.getLogger().warning("图片路径为空");
+                return null;
             }
 
+            // 规范化路径
+            File imageFile = new File(imagePath);
+            if (!imageFile.exists()) {
+                plugin.getLogger().warning("图片文件不存在: " + imagePath);
+                return null;
+            }
+
+            // 检查文件是否可读
+            if (!imageFile.canRead()) {
+                plugin.getLogger().warning("无法读取图片文件: " + imagePath);
+                return null;
+            }
+
+            // 获取MIME类型
+            String mimeType = Files.probeContentType(imageFile.toPath());
+            if (mimeType == null || !mimeType.startsWith("image/")) {
+                mimeType = "image/png"; // 默认使用 PNG
+            }
+
+            // 读取文件内容
             byte[] fileContent = Files.readAllBytes(imageFile.toPath());
             return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(fileContent);
         } catch (IOException e) {
-            plugin.getLogger().warning("转换图片到Base64失败: " + imagePath + " - " + e.getMessage());
+            plugin.getLogger().warning("处理图片文件失败: " + imagePath + " - " + e.getMessage());
             return null;
         }
+    }
+
+    // 添加新的辅助方法来处理图标路径
+    private String resolveIconPath(String iconPath) {
+        try {
+            // 如果是绝对路径，直接返回
+            if (new File(iconPath).isAbsolute()) {
+                return iconPath;
+            }
+
+            // 如果是相对于插件目录的路径
+            if (iconPath.startsWith("plugins/")) {
+                return new File(plugin.getServer().getWorldContainer(), iconPath).getAbsolutePath();
+            }
+
+            // 默认从插件的图标目录加载
+            String customPath = plugin.getConfig().getString("icons.custom_path", "plugins/GeyserMenu/icons");
+            return new File(plugin.getServer().getWorldContainer(), 
+                customPath + File.separator + new File(iconPath).getName()).getAbsolutePath();
+        } catch (Exception e) {
+            plugin.getLogger().warning("解析图标路径失败: " + iconPath + " - " + e.getMessage());
+            return null;
+        }
+    }
+
+    // 修改图标处理相关代码
+    private FormImage processIcon(String icon, String iconType, String iconPath) {
+        try {
+            // 处理自定义路径图标
+            if ("path".equals(iconType)) {
+                String resolvedPath = resolveIconPath(iconPath);
+                if (resolvedPath != null) {
+                    String base64 = imageToBase64(resolvedPath);
+                    if (base64 != null) {
+                        return FormImage.of(FormImage.Type.URL, base64);
+                    }
+                }
+                plugin.getLogger().warning("无法加载自定义图标: " + iconPath);
+            }
+            
+            // 处理URL图标
+            else if ("url".equals(iconType)) {
+                // 检查是否允许URL图标
+                if (!plugin.getConfig().getBoolean("icons.allow_url", true)) {
+                    plugin.getLogger().warning("URL图标已被禁用");
+                    return getDefaultFormImage();
+                }
+                
+                // 检查URL安全性
+                if (isUrlSafe(iconPath)) {
+                    String base64 = fetchAndConvertIcon(iconPath);
+                    if (base64 != null) {
+                        return FormImage.of(FormImage.Type.URL, base64);
+                    }
+                } else {
+                    plugin.getLogger().warning("不安全的图标URL: " + iconPath);
+                }
+            }
+            
+            // 处理 Minecraft 物品图标
+            else {
+                String texturePath = formatMinecraftIcon(icon);
+                if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                    plugin.getLogger().info("使用材质路径: " + texturePath);
+                }
+                return FormImage.of(FormImage.Type.PATH, texturePath);
+            }
+            
+            return getDefaultFormImage();
+        } catch (Exception e) {
+            plugin.getLogger().warning("处理图标时出错: " + e.getMessage());
+            return getDefaultFormImage();
+        }
+    }
+
+    // 添加辅助方法
+    private boolean isUrlSafe(String url) {
+        try {
+            if (url == null || url.isEmpty()) {
+                return false;
+            }
+            
+            // 检查URL长度
+            int maxLength = plugin.getConfig().getInt("icons.url.max-length", 256);
+            if (url.length() > maxLength) {
+                return false;
+            }
+            
+            // 检查是否需要HTTPS
+            if (plugin.getConfig().getBoolean("icons.url.https-only", true) 
+                && !url.toLowerCase().startsWith("https://")) {
+                return false;
+            }
+            
+            // 检查域名白名单
+            URL urlObj = new URL(url);
+            String host = urlObj.getHost().toLowerCase();
+            List<String> allowedDomains = plugin.getConfig().getStringList("icons.url.allowed-domains");
+            return allowedDomains.stream().anyMatch(host::endsWith);
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("URL安全检查失败: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private FormImage getDefaultFormImage() {
+        String defaultIcon = plugin.getConfig().getString("icons.default", "paper");
+        String texturePath = formatMinecraftIcon(defaultIcon);
+        if (plugin.getConfig().getBoolean("settings.debug", false)) {
+            plugin.getLogger().info("使用默认图标: " + texturePath);
+        }
+        return FormImage.of(FormImage.Type.PATH, texturePath);
     }
 
     // 添加新的辅助方法
@@ -504,34 +590,52 @@ public class MenuManager {
         }
     }
 
-    // 添加新的辅助方法
+    // 修改 formatMinecraftIcon 方法，确保返回基岩版可识别的材质路径
     private String formatMinecraftIcon(String icon) {
         if (icon == null || icon.isEmpty()) {
             return "textures/items/" + getDefaultIcon();
         }
+        
+        // 移除 minecraft: 前缀
+        icon = icon.replace("minecraft:", "");
         
         // 如果已经包含完整路径，直接返回
         if (icon.startsWith("textures/")) {
             return icon;
         }
         
-        // 移除 minecraft: 前缀
-        icon = icon.replace("minecraft:", "");
-        
-        // 处理特殊方块
-        if (icon.endsWith("_block")) {
-            return "textures/blocks/" + icon;
-        }
-        
-        // 处理特殊物品
-        switch (icon.toLowerCase()) {
-            case "grass":
-            case "stone":
-            case "dirt":
-                return "textures/blocks/" + icon;
-            default:
-                return "textures/items/" + icon;
-        }
+        // 基岭版材质路径映射
+        return switch (icon.toLowerCase()) {
+            // 方块
+            case "grass_block", "grass" -> "textures/blocks/grass_side";
+            case "stone" -> "textures/blocks/stone";
+            case "dirt" -> "textures/blocks/dirt";
+            case "diamond_block" -> "textures/blocks/diamond_block";
+            case "oak_log" -> "textures/blocks/log_oak";
+            case "oak_planks" -> "textures/blocks/planks_oak";
+            
+            // 物品
+            case "diamond" -> "textures/items/diamond";
+            case "diamond_sword" -> "textures/items/diamond_sword";
+            case "diamond_pickaxe" -> "textures/items/diamond_pickaxe";
+            case "compass" -> "textures/items/compass_item";
+            case "clock" -> "textures/items/clock_item";
+            case "paper" -> "textures/items/paper";
+            case "book" -> "textures/items/book_normal";
+            case "writable_book" -> "textures/items/book_writable";
+            case "written_book" -> "textures/items/book_written";
+            case "nether_star" -> "textures/items/nether_star";
+            case "arrow" -> "textures/items/arrow";
+            case "chest" -> "textures/blocks/chest_front";
+            
+            // 默认为物品路径
+            default -> {
+                if (icon.endsWith("_block")) {
+                    yield "textures/blocks/" + icon;
+                }
+                yield "textures/items/" + icon;
+            }
+        };
     }
 
     /**

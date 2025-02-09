@@ -35,19 +35,54 @@ security:
 
 ### 图标设置
 
+支持三种类型的图标：
+
+1. Minecraft 材质
 ```yaml
-icons:
-  # 自定义图标目录
-  custom_path: "plugins/GeyserMenu/icons"
-  
-  # URL图标设置
-  allow_url: true
-  url:
-    allowed-domains:
-      - "i.imgur.com"
-    https-only: true
-    max-length: 256
+icon: "diamond"  # 不需要 minecraft: 前缀
 ```
+
+2. 本地图片
+```yaml
+icon: "stone"  # 基础图标（必需）
+icon_type: "path"
+icon_path: "plugins/GeyserMenu/icons/custom.png"
+```
+
+3. 网络图片
+```yaml
+icon: "stone"  # 基础图标（必需）
+icon_type: "url"
+icon_url: "https://example.com/icon.png"
+```
+
+#### 基岩版材质路径
+
+插件内置了常用的材质路径映射：
+
+- 方块：
+  - grass_block -> textures/blocks/grass_side
+  - stone -> textures/blocks/stone
+  - dirt -> textures/blocks/dirt
+  - diamond_block -> textures/blocks/diamond_block
+  - oak_log -> textures/blocks/log_oak
+  - oak_planks -> textures/blocks/planks_oak
+
+- 物品：
+  - diamond -> textures/items/diamond
+  - diamond_sword -> textures/items/diamond_sword
+  - diamond_pickaxe -> textures/items/diamond_pickaxe
+  - compass -> textures/items/compass_item
+  - clock -> textures/items/clock_item
+  - paper -> textures/items/paper
+  - book -> textures/items/book_normal
+  - writable_book -> textures/items/book_writable
+  - written_book -> textures/items/book_written
+  - arrow -> textures/items/arrow
+  - chest -> textures/blocks/chest_front
+  - wheat -> textures/items/wheat
+
+其他物品默认使用 `textures/items/物品名` 路径。
 
 ## 消息配置
 
@@ -85,7 +120,7 @@ menu:
 items:
   - text: "按钮文本"
     description: "按钮描述"
-    icon: "minecraft:diamond"
+    icon: "diamond"  # 不需要 minecraft: 前缀
     command: "tp spawn"
     execute_as: "player"
 
@@ -94,25 +129,25 @@ items:
     submenu: "other_menu.yml"
 ```
 
-### 图标类型
+### 图标设置
 
-支持三种图标来源：
+支持三种类型的图标：
 
 1. Minecraft 材质
 ```yaml
-icon: "minecraft:diamond"
+icon: "diamond"  # 不需要 minecraft: 前缀
 ```
 
 2. 本地图片
 ```yaml
-icon: "stone"
+icon: "stone"  # 基础图标（必需）
 icon_type: "path"
 icon_path: "plugins/GeyserMenu/icons/custom.png"
 ```
 
 3. 网络图片
 ```yaml
-icon: "stone"
+icon: "stone"  # 基础图标（必需）
 icon_type: "url"
 icon_url: "https://example.com/icon.png"
 ``` 

@@ -20,19 +20,19 @@ menu:
     # 传送菜单按钮
     - text: "§9传送菜单"
       description: "传送到服务器各个区域"
-      icon: "minecraft:compass"
+      icon: "compass"  # 移除 minecraft: 前缀
       submenu: "teleport.yml"  # 打开子菜单
     
     # 商店菜单按钮
     - text: "§a商店菜单"
       description: "购买和出售物品"
-      icon: "minecraft:chest"
+      icon: "chest"
       submenu: "shop.yml"  # 打开子菜单
     
     # 返回主城按钮
     - text: "§b返回主城"
       description: "点击立即返回主城出生点"
-      icon: "minecraft:nether_star"
+      icon: "nether_star"
       command: "spawn"  # 执行命令
       execute_as: "player"  # 以玩家身份执行
     
