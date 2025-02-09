@@ -170,33 +170,30 @@ public class MenuManager {
 
             // 处理按钮
             List<MenuAction> actions = new ArrayList<>();
-            ConfigurationSection items = menuSection.getConfigurationSection("items");
-            if (items != null) {
-                for (String key : items.getKeys(false)) {
-                    ConfigurationSection item = items.getConfigurationSection(key);
-                    if (item == null) continue;
-
+            List<Map<?, ?>> itemList = menuSection.getMapList("items");
+            if (itemList != null && !itemList.isEmpty()) {
+                for (Map<?, ?> item : itemList) {
                     // 处理按钮文本和图标
-                    String text = parsePlaceholders(player, item.getString("text", "未命名"));
-                    String description = parsePlaceholders(player, item.getString("description", ""));
+                    String text = parsePlaceholders(player, getString(item, "text", "未命名"));
+                    String description = parsePlaceholders(player, getString(item, "description", ""));
                     
                     // 处理图标
-                    String icon = item.getString("icon");
-                    String iconType = item.getString("icon_type");
-                    String iconPath = item.getString("icon_path");
+                    String icon = getString(item, "icon", plugin.getConfig().getString("icons.default", "paper"));
+                    String iconType = getString(item, "icon_type", null);
+                    String iconPath = getString(item, "icon_path", null);
                     FormImage formImage = processIcon(icon, iconType, iconPath);
 
                     // 添加按钮
-                    if (!description.isEmpty()) {
+                    if (description != null && !description.isEmpty()) {
                         form.button(text + "\n" + description, formImage);
                     } else {
                         form.button(text, formImage);
                     }
 
                     // 记录动作
-                    String command = item.getString("command");
-                    String executeAs = item.getString("execute_as", "player");
-                    String submenu = item.getString("submenu");
+                    String command = getString(item, "command", null);
+                    String executeAs = getString(item, "execute_as", "player");
+                    String submenu = getString(item, "submenu", null);
                     actions.add(new MenuAction(command, executeAs, submenu));
                 }
             }

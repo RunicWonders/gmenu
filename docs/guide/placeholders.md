@@ -17,14 +17,19 @@ GeyserMenu 支持 PlaceholderAPI 变量，可以在菜单中动态显示信息�
 ```yaml
 menu:
   title: "欢迎 %player_name%"
+  subtitle: "你的等级: %player_level%"
   content: "你的余额: %vault_eco_balance%"
   footer: "在线人数: %server_online%"
   items:
-    - text: "%player_name% 的信息"
-      description: "等级: %player_level%"
-      command: "balance %player_name%"
-      icon: "paper"  # 不需要 minecraft: 前缀
+    - text: "%player_name% 的背包"
+      description: "点击打开背包"
+      icon: "chest"
+      command: "invsee %player_name%"
 ```
+
+::: tip 提示
+变量会在显示菜单时自动更新，除非启用了缓存。
+:::
 
 ## 变量缓存
 

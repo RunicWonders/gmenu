@@ -72,11 +72,22 @@ menu:
   subtitle: "选择一个选项"
   content: "这是菜单内容"
   items:
-    - text: "测试按钮"
+    - text: "传送菜单"
+      description: "打开传送菜单"
+      icon: "compass"
+      submenu: "teleport.yml"
+    
+    - text: "执行命令"
       description: "点击执行命令"
-      icon: "diamond"  # 不需要 minecraft: 前缀
+      icon: "diamond"
       command: "say 你好"
 ```
+
+::: tip 提示
+- 每个按钮必须有 text 和 icon
+- command 或 submenu 二选一
+- description 是可选的
+:::
 
 ## 使用方法
 

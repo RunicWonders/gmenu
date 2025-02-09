@@ -108,11 +108,41 @@ error:
 
 ```yaml
 menu:
-  title: "菜单标题"
-  subtitle: "副标题"
-  content: "菜单内容"
-  footer: "页脚文本"
+  # 菜单标题
+  title: "主菜单"
+  
+  # 副标题（可选）
+  subtitle: "选择一个选项"
+  
+  # 主要内容（可选）
+  content: "这是菜单内容"
+  
+  # 页脚（可选）
+  footer: "在线人数: %server_online%"
+  
+  # 按钮列表
+  items:
+    - text: "传送菜单"
+      description: "打开传送菜单"
+      icon: "compass"
+      submenu: "teleport.yml"
+    
+    - text: "商店菜单"
+      description: "打开商店菜单"
+      icon: "diamond"
+      submenu: "shop.yml"
+    
+    - text: "返回出生点"
+      description: "点击传送到出生点"
+      icon: "nether_star"
+      command: "spawn"
 ```
+
+::: tip 提示
+- 所有文本支持颜色代码 (使用 & 符号)
+- 支持 PlaceholderAPI 变量
+- 图标不需要 minecraft: 前缀
+:::
 
 ### 按钮配置
 

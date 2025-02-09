@@ -1,16 +1,13 @@
 # 主菜单配置
 menu:
   # 菜单标题 - 显示在表单最上方
-  title: "§6服务器菜单"
+  title: "主菜单"
   
   # 副标题 - 显示在标题下方
-  subtitle: "§7欢迎来到服务器"
+  subtitle: "选择一个选项"
   
   # 菜单内容 - 支持多行文本
-  content: |-
-    §e这是服务器的主菜单
-    §f你可以在这里选择要进行的操作
-    §7点击下方按钮开始吧
+  content: "这是菜单内容"
   
   # 页脚 - 支持PAPI变量
   footer: "§8服务器当前在线: %server_online% 人"
@@ -18,30 +15,19 @@ menu:
   # 菜单按钮列表
   items:
     # 传送菜单按钮
-    - text: "§9传送菜单"
-      description: "传送到服务器各个区域"
-      icon: "compass"  # 移除 minecraft: 前缀
-      submenu: "teleport.yml"  # 打开子菜单
+    - text: "传送菜单"
+      description: "打开传送菜单"
+      icon: "compass"
+      submenu: "teleport.yml"
     
     # 商店菜单按钮
-    - text: "§a商店菜单"
-      description: "购买和出售物品"
-      icon: "chest"
-      submenu: "shop.yml"  # 打开子菜单
+    - text: "商店菜单"
+      description: "打开商店菜单"
+      icon: "diamond"
+      submenu: "shop.yml"
     
-    # 返回主城按钮
-    - text: "§b返回主城"
-      description: "点击立即返回主城出生点"
+    # 返回出生点按钮
+    - text: "返回出生点"
+      description: "点击传送到出生点"
       icon: "nether_star"
-      command: "spawn"  # 执行命令
-      execute_as: "player"  # 以玩家身份执行
-    
-    # 自定义图标示例
-    - text: "§c自定义图标"
-      description: "使用自定义路径的图标"
-      icon: "stone"  # 基础图标（必需）
-      icon_type: "path"  # 图标类型：path或url
-      icon_path: "plugins/GeyserMenu/icons/icon.png"  # 自定义图标路径
-      # 使用URL图标示例:
-      # icon_type: "url"
-      # icon_url: "https://example.com/icon.png"
+      command: "spawn"
