@@ -87,6 +87,7 @@ menu:
 - 每个按钮必须有 text 和 icon
 - command 或 submenu 二选一
 - description 是可选的
+- 图标支持多种格式，详见配置文档
 :::
 
 ## 使用方法

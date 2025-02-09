@@ -35,54 +35,86 @@ security:
 
 ### 图标设置
 
-支持三种类型的图标：
+GeyserMenu 支持多种类型的图标：
 
-1. Minecraft 材质
+#### 1. 基岩版材质
+
+直接使用物品ID，不需要 minecraft: 前缀：
+
 ```yaml
-icon: "diamond"  # 不需要 minecraft: 前缀
+items:
+  - text: "传送菜单"
+    icon: "compass"  # 使用指南针图标
+  
+  - text: "商店"
+    icon: "diamond"  # 使用钻石图标
 ```
 
-2. 本地图片
+#### 2. 本地图片
+
+使用 icons 目录下的自定义图片：
+
 ```yaml
-icon: "stone"  # 基础图标（必需）
-icon_type: "path"
-icon_path: "plugins/GeyserMenu/icons/custom.png"
+items:
+  - text: "自定义图标"
+    icon: "stone"  # 基础图标（必需）
+    icon_type: "path"
+    icon_path: "custom.png"  # 相对于 plugins/GeyserMenu/icons 目录
 ```
 
-3. 网络图片
+#### 3. 网络图片
+
+使用网络图片作为图标：
+
 ```yaml
-icon: "stone"  # 基础图标（必需）
-icon_type: "url"
-icon_url: "https://example.com/icon.png"
+items:
+  - text: "网络图标"
+    icon: "paper"  # 基础图标（必需）
+    icon_type: "url"
+    icon_path: "https://example.com/icon.png"
 ```
 
-#### 基岩版材质路径
+#### 4. 基岩版UI图标
 
-插件内置了常用的材质路径映射：
+使用基岩版内置的UI图标：
 
-- 方块：
-  - grass_block -> textures/blocks/grass_side
-  - stone -> textures/blocks/stone
-  - dirt -> textures/blocks/dirt
-  - diamond_block -> textures/blocks/diamond_block
-  - oak_log -> textures/blocks/log_oak
-  - oak_planks -> textures/blocks/planks_oak
+```yaml
+items:
+  - text: "UI图标"
+    icon: "textures/ui/icon"  # 直接使用完整路径
+```
 
-- 物品：
-  - diamond -> textures/items/diamond
-  - diamond_sword -> textures/items/diamond_sword
-  - diamond_pickaxe -> textures/items/diamond_pickaxe
-  - compass -> textures/items/compass_item
-  - clock -> textures/items/clock_item
-  - paper -> textures/items/paper
-  - book -> textures/items/book_normal
-  - writable_book -> textures/items/book_writable
-  - written_book -> textures/items/book_written
-  - arrow -> textures/items/arrow
-  - chest -> textures/blocks/chest_front
-  - wheat -> textures/items/wheat
+#### 图标安全设置
 
-其他物品默认使用 `textures/items/物品名` 路径。
+在 config.yml 中配置图标相关安全选项：
+
+```yaml
+icons:
+  # 是否允许使用网络图片
+  allow_url: true
+  
+  # 默认图标
+  default: "paper"
+  
+  # 网络图标设置
+  url:
+    # 允许的域名
+    allowed-domains:
+      - "i.imgur.com"
+      - "cdn.example.com"
+    
+    # 是否只允许HTTPS
+    https-only: true
+    
+    # URL最大长度
+    max-length: 256
+```
+
+::: tip 提示
+- 本地图片支持 PNG、JPG 格式
+- 图片大小建议不超过 128x128
+- 网络图片需要配置允许的域名
+:::
 
 ## 消息配置
 
@@ -143,44 +175,6 @@ menu:
 - 支持 PlaceholderAPI 变量
 - 图标不需要 minecraft: 前缀
 :::
-
-### 按钮配置
-
-```yaml
-items:
-  - text: "按钮文本"
-    description: "按钮描述"
-    icon: "diamond"  # 不需要 minecraft: 前缀
-    command: "tp spawn"
-    execute_as: "player"
-
-  - text: "子菜单"
-    icon: "book"
-    submenu: "other_menu.yml"
-```
-
-### 图标设置
-
-支持三种类型的图标：
-
-1. Minecraft 材质
-```yaml
-icon: "diamond"  # 不需要 minecraft: 前缀
-```
-
-2. 本地图片
-```yaml
-icon: "stone"  # 基础图标（必需）
-icon_type: "path"
-icon_path: "plugins/GeyserMenu/icons/custom.png"
-```
-
-3. 网络图片
-```yaml
-icon: "stone"  # 基础图标（必需）
-icon_type: "url"
-icon_url: "https://example.com/icon.png"
-```
 
 ## 配置保存
 

@@ -489,17 +489,35 @@ public class MenuManager {
                 switch (iconType.toLowerCase()) {
                     case "path" -> {
                         // 处理本地图片
-                        File iconFile = new File(plugin.getDataFolder(), "icons/" + iconPath);
+                        File iconFile;
+                        if (iconPath.startsWith("/") || iconPath.startsWith("\\")) {
+                            iconFile = new File(iconPath);
+                        } else {
+                            iconFile = new File(plugin.getDataFolder(), "icons" + File.separator + iconPath);
+                        }
+                        
                         if (!iconFile.exists()) {
                             if (plugin.getConfig().getBoolean("settings.debug", false)) {
                                 plugin.getLogger().warning("图标文件不存在: " + iconFile.getAbsolutePath());
                             }
                             return getDefaultFormImage();
                         }
-                        return FormImage.of(FormImage.Type.PATH, iconFile.getPath());
+                        
+                        // 检查文件是否在允许的目录内
+                        if (!iconFile.getCanonicalPath().startsWith(
+                                new File(plugin.getDataFolder(), "icons").getCanonicalPath())) {
+                            plugin.getLogger().warning("图标文件路径不安全: " + iconFile.getPath());
+                            return getDefaultFormImage();
+                        }
+                        
+                        // 转换为Base64
+                        String base64 = imageToBase64(iconFile.getPath());
+                        if (base64 != null) {
+                            return FormImage.of(FormImage.Type.URL, base64);
+                        }
+                        return getDefaultFormImage();
                     }
                     case "url" -> {
-                        // 处理网络图片
                         if (!isUrlSafe(iconPath)) {
                             if (plugin.getConfig().getBoolean("settings.debug", false)) {
                                 plugin.getLogger().warning("不安全的图标URL: " + iconPath);
@@ -510,12 +528,17 @@ public class MenuManager {
                         if (base64Image != null) {
                             return FormImage.of(FormImage.Type.URL, base64Image);
                         }
+                        return getDefaultFormImage();
                     }
                 }
             }
             
-            // 使用 Minecraft 材质
-            return FormImage.of(FormImage.Type.PATH, formatMinecraftIcon(icon));
+            // 使用 Minecraft/基岩版材质
+            String texturePath = formatMinecraftIcon(icon);
+            if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                plugin.getLogger().info("使用材质路径: " + texturePath);
+            }
+            return FormImage.of(FormImage.Type.PATH, texturePath);
             
         } catch (Exception e) {
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
@@ -563,32 +586,6 @@ public class MenuManager {
             plugin.getLogger().info("使用默认图标: " + texturePath);
         }
         return FormImage.of(FormImage.Type.PATH, texturePath);
-    }
-
-    // 添加新的辅助方法
-    private String getDefaultIcon() {
-        return plugin.getConfig().getString("icons.default", "paper");
-    }
-
-    private String fetchAndConvertIcon(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            
-            try (InputStream inputStream = connection.getInputStream()) {
-                byte[] imageBytes = IOUtils.toByteArray(inputStream);
-                String mimeType = connection.getContentType();
-                if (mimeType == null) {
-                    mimeType = "image/png";
-                }
-                return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
-            }
-        } catch (Exception e) {
-            plugin.getLogger().warning("获取URL图标失败: " + urlString + " - " + e.getMessage());
-            return null;
-        }
     }
 
     // 修改 formatMinecraftIcon 方法，确保返回基岩版可识别的材质路径
@@ -640,5 +637,32 @@ public class MenuManager {
      */
     public List<String> getMenuList() {
         return new ArrayList<>(menus.keySet());
+    }
+
+    private String getDefaultIcon() {
+        return plugin.getConfig().getString("icons.default", "paper");
+    }
+
+    private String fetchAndConvertIcon(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(plugin.getConfig().getInt("icons.loading.connect-timeout", 5000));
+            connection.setReadTimeout(plugin.getConfig().getInt("icons.loading.read-timeout", 5000));
+            
+            try (InputStream inputStream = connection.getInputStream()) {
+                byte[] imageBytes = IOUtils.toByteArray(inputStream);
+                String mimeType = connection.getContentType();
+                if (mimeType == null) {
+                    mimeType = "image/png";
+                }
+                return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
+            }
+        } catch (Exception e) {
+            if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                plugin.getLogger().warning("获取URL图标失败: " + urlString + " - " + e.getMessage());
+            }
+            return null;
+        }
     }
 }
