@@ -33,4 +33,20 @@ command:
   
   open:
     success: "§a已为玩家 {0} 打开菜单!"
-    usage: "/gmenu open <玩家名> <菜单名>" 
+    usage: "/gmenu open <玩家名> <菜单名>"
+
+update:
+  # 控制台消息
+  console:
+    checking: "正在检查更新..."
+    found: "§e发现新版本: v{0}"
+    download: "§6下载地址: {0}"
+    failed: "§c检查更新失败: {0}"
+    up-to-date: "§a插件已是最新版本"
+  
+  # 玩家消息
+  player:
+    available: "§e发现新版本 v{0} 可用"
+    current: "§7当前版本: v{1}"
+    download: "§6下载地址: §f{0}"
+    click-to-download: "§a点击打开下载页面" 

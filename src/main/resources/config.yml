@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.1.0
+# 版本: 1.1.1
 
 # 插件基础设置
 settings:
@@ -29,6 +29,17 @@ settings:
     
   # 命令安全检查 - 防止执行危险命令
   enable-command-security: true
+  
+  # 是否检查更新
+  check-updates: true
+  
+  # 更新源设置
+  update:
+    # 是否在玩家进入时提示更新
+    notify-on-join: true
+    
+    # 是否只通知管理员
+    notify-ops-only: false
 
 # 菜单配置 - 在这里定义所有可用的菜单
 menus:

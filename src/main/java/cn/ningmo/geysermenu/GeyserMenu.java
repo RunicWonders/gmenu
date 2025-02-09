@@ -4,11 +4,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import org.bukkit.Bukkit;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import org.json.JSONObject;
 
 public class GeyserMenu extends JavaPlugin {
     private static GeyserMenu instance;
     private MenuManager menuManager;
     private YamlConfiguration messages;
+    
+    // 添加更新检查相关字段
+    private static final String UPDATE_URL = "https://api.github.com/repos/ning-g-mo/gmenu/releases/latest";
+    private boolean updateAvailable = false;
+    private String latestVersion = null;
     
     @Override
     public void onEnable() {
@@ -41,6 +51,11 @@ public class GeyserMenu extends JavaPlugin {
             
             // 加载消息配置
             reloadMessages();
+            
+            // 检查更新
+            if (getConfig().getBoolean("settings.check-updates", true)) {
+                checkUpdate();
+            }
             
             // 初始化菜单管理器
             menuManager = new MenuManager(this);
@@ -215,5 +230,62 @@ public class GeyserMenu extends JavaPlugin {
         if (!iconDir.exists()) {
             iconDir.mkdirs();
         }
+    }
+    
+    private void checkUpdate() {
+        if (getConfig().getBoolean("settings.debug", false)) {
+            getLogger().info(getMessage("update.console.checking"));
+        }
+        
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                URL url = new URL(UPDATE_URL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+
+                if (conn.getResponseCode() == 200) {
+                    try (BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()))) {
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+
+                        // 解析JSON响应
+                        JSONObject json = new JSONObject(response.toString());
+                        String tagName = json.getString("tag_name");
+                        if (tagName.startsWith("v")) {
+                            latestVersion = tagName.substring(1);
+                            String currentVersion = getDescription().getVersion();
+                            
+                            if (!currentVersion.equals(latestVersion)) {
+                                updateAvailable = true;
+                                getLogger().info(getMessage("update.console.found", latestVersion));
+                                getLogger().info(getMessage("update.console.download", 
+                                    json.getString("html_url")));
+                            } else if (getConfig().getBoolean("settings.debug", false)) {
+                                getLogger().info(getMessage("update.console.up-to-date"));
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                if (getConfig().getBoolean("settings.debug", false)) {
+                    getLogger().warning(getMessage("update.console.failed", e.getMessage()));
+                }
+            }
+        });
+    }
+    
+    // 添加 getter 方法
+    public boolean isUpdateAvailable() {
+        return updateAvailable;
+    }
+
+    public String getLatestVersion() {
+        return latestVersion;
     }
 }

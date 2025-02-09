@@ -203,12 +203,16 @@ public class MenuManager {
                 if (response == null || response.isEmpty()) return;  // 玩家关闭表单
                 
                 try {
-                    int clickedButton = Integer.parseInt(response);  // SimpleForm 的响应直接就是按钮索引
+                    // 移除可能的换行符和空格
+                    String cleanResponse = response.trim();
+                    int clickedButton = Integer.parseInt(cleanResponse);  // SimpleForm 的响应直接就是按钮索引
                     if (clickedButton >= 0 && clickedButton < actions.size()) {
                         MenuAction action = actions.get(clickedButton);
                         if (action.submenu() != null) {
                             // 打开子菜单
-                            openMenu(player, action.submenu());
+                            Bukkit.getScheduler().runTask(plugin, () -> {
+                                openMenu(player, action.submenu());
+                            });
                         } else if (action.command() != null) {
                             // 执行命令
                             executeCommand(player, action.command(), action.executeAs());
