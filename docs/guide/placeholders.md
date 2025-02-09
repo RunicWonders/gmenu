@@ -32,11 +32,19 @@ menu:
 
 ```yaml
 performance:
-  cache-placeholders: true   # 启用变量缓存
-  cache-refresh: 30         # 缓存刷新间隔（秒）
-  max-cache-size: 1000      # 最大缓存数量
+  # 启用变量缓存
+  cache-placeholders: true
+  
+  # 缓存刷新间隔（秒）
+  cache-refresh: 30
+  
+  # 最大缓存数量
+  max-cache-size: 1000
+  
+  # 重载时清除缓存
+  clear-cache-on-reload: true
 ```
 
 ::: warning 注意
-启用缓存可能导致变量更新有延迟
+启用缓存可能导致变量更新有延迟，请根据需要调整刷新间隔。
 ::: 

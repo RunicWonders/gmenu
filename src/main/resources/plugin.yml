@@ -1,5 +1,5 @@
 name: GeyserMenu
-version: '1.0.8'
+version: '1.0.9'
 main: cn.ningmo.geysermenu.GeyserMenu
 author: 柠枺
 api-version: '1.21'

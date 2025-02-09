@@ -27,13 +27,6 @@ public class GeyserMenu extends JavaPlugin {
                 return;
             }
             
-            // 添加配置检查
-            if (!checkConfig()) {
-                getLogger().severe("配置文件检查失败，插件将被禁用!");
-                getServer().getPluginManager().disablePlugin(this);
-                return;
-            }
-            
             // 保存默认配置
             saveDefaultConfig();
             
@@ -43,33 +36,17 @@ public class GeyserMenu extends JavaPlugin {
             saveResource("menus/shop.yml", false);
             saveResource("menus/teleport.yml", false);
             
-            // 添加新的配置项到配置文件中
-            getConfig().addDefault("settings.enable-command-security", true);
-            getConfig().options().copyDefaults(true);
-            saveConfig();
-            
-            // 创建菜单目录
-            File menuDir = new File(getDataFolder(), "menus");
-            if (!menuDir.exists()) {
-                menuDir.mkdirs();
-            }
-            
-            // 保存默认菜单
-            saveResource("menus/menu.yml", false);
-            saveResource("menus/teleport.yml", false);
-            saveResource("menus/shop.yml", false);
-            
-            // 创建图标目录
-            File iconDir = new File(getDataFolder(), "icons");
-            if (!iconDir.exists()) {
-                iconDir.mkdirs();
-            }
+            // 创建必要的目录
+            createDirectories();
             
             // 加载消息配置
             reloadMessages();
             
             // 初始化菜单管理器
             menuManager = new MenuManager(this);
+            
+            // 加载菜单
+            menuManager.loadMenus();
             
             // 注册命令
             if (getCommand("geysermenu") != null) {
@@ -168,22 +145,16 @@ public class GeyserMenu extends JavaPlugin {
     private boolean checkConfig() {
         try {
             // 检查配置文件版本
-            if (!getConfig().isSet("settings.default-menu")) {
-                getLogger().warning("配置文件缺少必要设置，将重新生成");
-                saveResource("config.yml", true);
-                reloadConfig();
+            if (!getConfig().isString("settings.default-menu")) {
+                getLogger().warning("配置文件缺少必要设置");
+                return false;
             }
             
             // 检查消息文件
             File messagesFile = new File(getDataFolder(), "messages.yml");
             if (!messagesFile.exists()) {
-                saveResource("messages.yml", false);
-            }
-            
-            // 检查菜单目录
-            File menuFolder = new File(getDataFolder(), "menus");
-            if (!menuFolder.exists()) {
-                menuFolder.mkdirs();
+                getLogger().warning("消息配置文件不存在");
+                return false;
             }
             
             return true;
@@ -196,16 +167,16 @@ public class GeyserMenu extends JavaPlugin {
     
     @Override
     public void reloadConfig() {
+        // 先重载主配置
         super.reloadConfig();
         
         // 重新加载消息配置
-        File messagesFile = new File(getDataFolder(), "messages.yml");
-        if (messagesFile.exists()) {
-            messages = YamlConfiguration.loadConfiguration(messagesFile);
-        }
+        reloadMessages();
         
-        // 重新加载菜单
-        menuManager.loadMenus();
+        // 如果菜单管理器已初始化，则重新加载菜单
+        if (menuManager != null) {
+            menuManager.loadMenus();
+        }
     }
     
     // 静态方法应该检查实例是否存在
@@ -229,6 +200,20 @@ public class GeyserMenu extends JavaPlugin {
         } catch (Exception e) {
             getLogger().warning("获取前缀时出错");
             return "§6[GeyserMenu] §f";
+        }
+    }
+    
+    private void createDirectories() {
+        // 创建菜单目录
+        File menuDir = new File(getDataFolder(), "menus");
+        if (!menuDir.exists()) {
+            menuDir.mkdirs();
+        }
+        
+        // 创建图标目录
+        File iconDir = new File(getDataFolder(), "icons");
+        if (!iconDir.exists()) {
+            iconDir.mkdirs();
         }
     }
 }
