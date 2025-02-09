@@ -115,6 +115,7 @@ public class GeyserMenu extends JavaPlugin {
         try {
             String message = messages.getString(path);
             if (message == null) {
+                getLogger().warning("找不到消息配置: " + path);
                 return "§c消息未配置: " + path;
             }
             
@@ -129,7 +130,7 @@ public class GeyserMenu extends JavaPlugin {
             result.append(formattedMessage);
             return result.toString();
         } catch (Exception e) {
-            getLogger().warning("获取消息时出错: " + path);
+            getLogger().warning("获取消息时出错: " + path + ", 错误: " + e.getMessage());
             return "§c消息处理错误: " + path;
         }
     }
