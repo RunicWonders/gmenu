@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.0.6
+# 版本: 1.0.7
 
 # 插件基础设置
 settings:
@@ -60,14 +60,14 @@ menus:
 
 # 图标设置
 icons:
-  # 自定义图标存放目录
+  # 自定义图标存放目录 (使用相对于服务器根目录的路径)
   custom_path: "plugins/GeyserMenu/icons"
   
   # 是否允许使用网络图片作为图标
   allow_url: true
   
   # 默认图标 - 当图标加载失败时使用
-  default: "minecraft:paper"
+  default: "paper"  # 不需要 minecraft: 前缀
   
   # 网络图标安全设置
   url:

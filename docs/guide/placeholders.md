@@ -23,6 +23,7 @@ menu:
     - text: "%player_name% 的信息"
       description: "等级: %player_level%"
       command: "balance %player_name%"
+      icon: "paper"  # 不需要 minecraft: 前缀
 ```
 
 ## 变量缓存
@@ -31,9 +32,9 @@ menu:
 
 ```yaml
 performance:
-  cache-placeholders: true
-  cache-refresh: 30
-  max-cache-size: 1000
+  cache-placeholders: true   # 启用变量缓存
+  cache-refresh: 30         # 缓存刷新间隔（秒）
+  max-cache-size: 1000      # 最大缓存数量
 ```
 
 ::: warning 注意
