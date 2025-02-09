@@ -484,49 +484,43 @@ public class MenuManager {
     // 修改图标处理相关代码
     private FormImage processIcon(String icon, String iconType, String iconPath) {
         try {
-            // 处理自定义路径图标
-            if ("path".equals(iconType)) {
-                String resolvedPath = resolveIconPath(iconPath);
-                if (resolvedPath != null) {
-                    String base64 = imageToBase64(resolvedPath);
-                    if (base64 != null) {
-                        return FormImage.of(FormImage.Type.URL, base64);
+            // 如果指定了图标类型和路径
+            if (iconType != null && iconPath != null) {
+                switch (iconType.toLowerCase()) {
+                    case "path" -> {
+                        // 处理本地图片
+                        File iconFile = new File(plugin.getDataFolder(), "icons/" + iconPath);
+                        if (!iconFile.exists()) {
+                            if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                                plugin.getLogger().warning("图标文件不存在: " + iconFile.getAbsolutePath());
+                            }
+                            return getDefaultFormImage();
+                        }
+                        return FormImage.of(FormImage.Type.PATH, iconFile.getPath());
+                    }
+                    case "url" -> {
+                        // 处理网络图片
+                        if (!isUrlSafe(iconPath)) {
+                            if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                                plugin.getLogger().warning("不安全的图标URL: " + iconPath);
+                            }
+                            return getDefaultFormImage();
+                        }
+                        String base64Image = fetchAndConvertIcon(iconPath);
+                        if (base64Image != null) {
+                            return FormImage.of(FormImage.Type.URL, base64Image);
+                        }
                     }
                 }
-                plugin.getLogger().warning("无法加载自定义图标: " + iconPath);
             }
             
-            // 处理URL图标
-            else if ("url".equals(iconType)) {
-                // 检查是否允许URL图标
-                if (!plugin.getConfig().getBoolean("icons.allow_url", true)) {
-                    plugin.getLogger().warning("URL图标已被禁用");
-                    return getDefaultFormImage();
-                }
-                
-                // 检查URL安全性
-                if (isUrlSafe(iconPath)) {
-                    String base64 = fetchAndConvertIcon(iconPath);
-                    if (base64 != null) {
-                        return FormImage.of(FormImage.Type.URL, base64);
-                    }
-                } else {
-                    plugin.getLogger().warning("不安全的图标URL: " + iconPath);
-                }
-            }
+            // 使用 Minecraft 材质
+            return FormImage.of(FormImage.Type.PATH, formatMinecraftIcon(icon));
             
-            // 处理 Minecraft 物品图标
-            else {
-                String texturePath = formatMinecraftIcon(icon);
-                if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                    plugin.getLogger().info("使用材质路径: " + texturePath);
-                }
-                return FormImage.of(FormImage.Type.PATH, texturePath);
-            }
-            
-            return getDefaultFormImage();
         } catch (Exception e) {
-            plugin.getLogger().warning("处理图标时出错: " + e.getMessage());
+            if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                plugin.getLogger().warning("处理图标时出错: " + e.getMessage());
+            }
             return getDefaultFormImage();
         }
     }
@@ -636,12 +630,7 @@ public class MenuManager {
             case "chest" -> "textures/blocks/chest_front";
             
             // 默认为物品路径
-            default -> {
-                if (icon.endsWith("_block")) {
-                    yield "textures/blocks/" + icon;
-                }
-                yield "textures/items/" + icon;
-            }
+            default -> "textures/items/" + icon;
         };
     }
 
