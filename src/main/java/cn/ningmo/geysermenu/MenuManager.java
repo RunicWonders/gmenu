@@ -23,6 +23,11 @@ import org.apache.commons.io.IOUtils;
 import java.net.URL;
 import java.net.URLConnection;
 import java.io.InputStream;
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.io.ByteArrayOutputStream;
+import javax.imageio.ImageIO;
 
 public class MenuManager {
     private final GeyserMenu plugin;
@@ -443,19 +448,53 @@ public class MenuManager {
                 return null;
             }
 
+            // 检查文件大小
+            if (imageFile.length() > 1024 * 1024) { // 1MB
+                plugin.getLogger().warning("图片文件过大: " + imagePath);
+                return null;
+            }
+
+            // 检查图片尺寸
+            BufferedImage image = ImageIO.read(imageFile);
+            if (image == null) {
+                plugin.getLogger().warning("无法读取图片: " + imagePath);
+                return null;
+            }
+
+            int width = image.getWidth();
+            int height = image.getHeight();
+
+            // 检查尺寸限制
+            if (width > 128 || height > 128) {
+                plugin.getLogger().warning("图片尺寸过大 (" + width + "x" + height + "): " + imagePath);
+                // 自动缩放图片
+                image = resizeImage(image, Math.min(128, width), Math.min(128, height));
+            }
+
             // 获取MIME类型
             String mimeType = Files.probeContentType(imageFile.toPath());
             if (mimeType == null || !mimeType.startsWith("image/")) {
-                mimeType = "image/png"; // 默认使用 PNG
+                mimeType = "image/png";
             }
 
-            // 读取文件内容
-            byte[] fileContent = Files.readAllBytes(imageFile.toPath());
-            return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(fileContent);
+            // 转换为Base64
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, mimeType.substring(6), baos);
+            return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(baos.toByteArray());
+
         } catch (IOException e) {
             plugin.getLogger().warning("处理图片文件失败: " + imagePath + " - " + e.getMessage());
             return null;
         }
+    }
+
+    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = resizedImage.createGraphics();
+        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        graphics2D.dispose();
+        return resizedImage;
     }
 
     // 添加新的辅助方法来处理图标路径

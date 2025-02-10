@@ -57,10 +57,17 @@ items:
 ```yaml
 items:
   - text: "自定义图标"
-    icon: "stone"  # 基础图标（必需）
     icon_type: "path"
     icon_path: "custom.png"  # 相对于 plugins/GeyserMenu/icons 目录
 ```
+
+::: warning 图片要求
+- 支持格式：PNG、JPG
+- 推荐尺寸：32x32 或 64x64 像素
+- 最大尺寸：128x128 像素
+- 建议使用正方形图片
+- 图片大小不要超过 1MB
+:::
 
 #### 3. 网络图片
 
