@@ -523,53 +523,21 @@ public class MenuManager {
     // 修改图标处理相关代码
     private FormImage processIcon(String icon, String iconType, String iconPath) {
         try {
-            // 如果指定了图标类型和路径
-            if (iconType != null && iconPath != null) {
-                switch (iconType.toLowerCase()) {
-                    case "path" -> {
-                        // 处理本地图片
-                        File iconFile;
-                        if (iconPath.startsWith("/") || iconPath.startsWith("\\")) {
-                            iconFile = new File(iconPath);
-                        } else {
-                            iconFile = new File(plugin.getDataFolder(), "icons" + File.separator + iconPath);
-                        }
-                        
-                        if (!iconFile.exists()) {
-                            if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                                plugin.getLogger().warning("图标文件不存在: " + iconFile.getAbsolutePath());
-                            }
-                            return getDefaultFormImage();
-                        }
-                        
-                        // 检查文件是否在允许的目录内
-                        if (!iconFile.getCanonicalPath().startsWith(
-                                new File(plugin.getDataFolder(), "icons").getCanonicalPath())) {
-                            plugin.getLogger().warning("图标文件路径不安全: " + iconFile.getPath());
-                            return getDefaultFormImage();
-                        }
-                        
-                        // 转换为Base64
-                        String base64 = imageToBase64(iconFile.getPath());
-                        if (base64 != null) {
-                            return FormImage.of(FormImage.Type.URL, base64);
-                        }
-                        return getDefaultFormImage();
+            // 如果指定了URL图标
+            if (iconType != null && iconType.equalsIgnoreCase("url") && iconPath != null) {
+                if (!isUrlSafe(iconPath)) {
+                    if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                        plugin.getLogger().warning("不安全的图标URL: " + iconPath);
                     }
-                    case "url" -> {
-                        if (!isUrlSafe(iconPath)) {
-                            if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                                plugin.getLogger().warning("不安全的图标URL: " + iconPath);
-                            }
-                            return getDefaultFormImage();
-                        }
-                        String base64Image = fetchAndConvertIcon(iconPath);
-                        if (base64Image != null) {
-                            return FormImage.of(FormImage.Type.URL, base64Image);
-                        }
-                        return getDefaultFormImage();
-                    }
+                    return getDefaultFormImage();
                 }
+                
+                // 获取并转换URL图片
+                String base64Image = fetchAndConvertIcon(iconPath);
+                if (base64Image != null) {
+                    return FormImage.of(FormImage.Type.URL, base64Image);
+                }
+                return getDefaultFormImage();
             }
             
             // 使用 Minecraft/基岩版材质
@@ -587,7 +555,7 @@ public class MenuManager {
         }
     }
 
-    // 添加辅助方法
+    // URL安全检查
     private boolean isUrlSafe(String url) {
         try {
             if (url == null || url.isEmpty()) {
@@ -615,6 +583,30 @@ public class MenuManager {
         } catch (Exception e) {
             plugin.getLogger().warning("URL安全检查失败: " + e.getMessage());
             return false;
+        }
+    }
+
+    // 获取并转换URL图片
+    private String fetchAndConvertIcon(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            URLConnection connection = url.openConnection();
+            connection.setConnectTimeout(plugin.getConfig().getInt("icons.loading.connect-timeout", 5000));
+            connection.setReadTimeout(plugin.getConfig().getInt("icons.loading.read-timeout", 5000));
+            
+            try (InputStream inputStream = connection.getInputStream()) {
+                byte[] imageBytes = IOUtils.toByteArray(inputStream);
+                String mimeType = connection.getContentType();
+                if (mimeType == null) {
+                    mimeType = "image/png";
+                }
+                return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
+            }
+        } catch (Exception e) {
+            if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                plugin.getLogger().warning("获取URL图标失败: " + urlString + " - " + e.getMessage());
+            }
+            return null;
         }
     }
 
@@ -680,28 +672,5 @@ public class MenuManager {
 
     private String getDefaultIcon() {
         return plugin.getConfig().getString("icons.default", "paper");
-    }
-
-    private String fetchAndConvertIcon(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(plugin.getConfig().getInt("icons.loading.connect-timeout", 5000));
-            connection.setReadTimeout(plugin.getConfig().getInt("icons.loading.read-timeout", 5000));
-            
-            try (InputStream inputStream = connection.getInputStream()) {
-                byte[] imageBytes = IOUtils.toByteArray(inputStream);
-                String mimeType = connection.getContentType();
-                if (mimeType == null) {
-                    mimeType = "image/png";
-                }
-                return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
-            }
-        } catch (Exception e) {
-            if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                plugin.getLogger().warning("获取URL图标失败: " + urlString + " - " + e.getMessage());
-            }
-            return null;
-        }
     }
 }

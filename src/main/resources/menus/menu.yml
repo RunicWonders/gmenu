@@ -14,20 +14,16 @@ menu:
   
   # 菜单按钮列表
   items:
-    # 传送菜单按钮
+    # 使用基岩版材质
     - text: "传送菜单"
       description: "打开传送菜单"
       icon: "compass"
       submenu: "teleport.yml"
     
-    # 商店菜单按钮
-    - text: "商店菜单"
-      description: "打开商店菜单"
-      icon: "diamond"
-      submenu: "shop.yml"
-    
-    # 返回出生点按钮
-    - text: "返回出生点"
-      description: "点击传送到出生点"
-      icon: "nether_star"
-      command: "spawn"
+    # 使用网络图片
+    - text: "玩家头像"
+      description: "查看玩家信息"
+      icon: "player_head"
+      icon_type: "url"
+      icon_path: "https://mc-heads.net/avatar/%player_name%"
+      command: "profile %player_name%"

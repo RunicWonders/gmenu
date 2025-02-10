@@ -35,7 +35,7 @@ security:
 
 ### 图标设置
 
-GeyserMenu 支持多种类型的图标：
+GeyserMenu 支持两种类型的图标：
 
 #### 1. 基岩版材质
 
@@ -50,46 +50,23 @@ items:
     icon: "diamond"  # 使用钻石图标
 ```
 
-#### 2. 本地图片
-
-使用 icons 目录下的自定义图片：
-
-```yaml
-items:
-  - text: "自定义图标"
-    icon_type: "path"
-    icon_path: "custom.png"  # 相对于 plugins/GeyserMenu/icons 目录
-```
-
-::: warning 图片要求
-- 支持格式：PNG、JPG
-- 推荐尺寸：32x32 或 64x64 像素
-- 最大尺寸：128x128 像素
-- 建议使用正方形图片
-- 图片大小不要超过 1MB
-:::
-
-#### 3. 网络图片
+#### 2. 网络图片
 
 使用网络图片作为图标：
 
 ```yaml
 items:
-  - text: "网络图标"
-    icon: "paper"  # 基础图标（必需）
+  - text: "玩家头像"
+    icon: "player_head"  # 基础图标（当URL加载失败时使用）
     icon_type: "url"
-    icon_path: "https://example.com/icon.png"
+    icon_path: "https://mc-heads.net/avatar/%player_name%"
 ```
 
-#### 4. 基岩版UI图标
-
-使用基岩版内置的UI图标：
-
-```yaml
-items:
-  - text: "UI图标"
-    icon: "textures/ui/icon"  # 直接使用完整路径
-```
+::: warning 注意
+- 网络图片必须来自允许的域名
+- 仅支持 HTTPS 链接
+- URL 支持变量替换
+:::
 
 #### 图标安全设置
 
@@ -97,9 +74,6 @@ items:
 
 ```yaml
 icons:
-  # 是否允许使用网络图片
-  allow_url: true
-  
   # 默认图标
   default: "paper"
   
@@ -108,7 +82,7 @@ icons:
     # 允许的域名
     allowed-domains:
       - "i.imgur.com"
-      - "cdn.example.com"
+      - "mc-heads.net"
     
     # 是否只允许HTTPS
     https-only: true
@@ -116,12 +90,6 @@ icons:
     # URL最大长度
     max-length: 256
 ```
-
-::: tip 提示
-- 本地图片支持 PNG、JPG 格式
-- 图片大小建议不超过 128x128
-- 网络图片需要配置允许的域名
-:::
 
 ## 消息配置
 
