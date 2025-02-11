@@ -37,30 +37,22 @@ security:
 
 GeyserMenu 支持两种类型的图标：
 
-#### 1. 基岩版材质
+1. 基岩版材质图标
+   - 直接使用物品ID
+   - 自动映射到基岭版材质路径
+   - 不需要网络请求，性能最好
 
-直接使用物品ID，不需要 minecraft: 前缀：
+2. 网络图片图标
+   - 支持动态URL（可包含变量）
+   - 必须来自白名单域名
+   - 仅支持HTTPS链接
+   - 建议使用可靠的图片服务
 
-```yaml
-items:
-  - text: "传送菜单"
-    icon: "compass"  # 使用指南针图标
-  
-  - text: "商店"
-    icon: "diamond"  # 使用钻石图标
-```
-
-#### 2. 网络图片
-
-使用网络图片作为图标：
-
-```yaml
-items:
-  - text: "玩家头像"
-    icon: "player_head"  # 基础图标（当URL加载失败时使用）
-    icon_type: "url"
-    icon_path: "https://mc-heads.net/avatar/%player_name%"
-```
+推荐的头像服务：
+- mc-heads.net
+- minotar.net
+- crafatar.com
+- visage.surgeplay.com
 
 ::: warning 注意
 - 网络图片必须来自允许的域名

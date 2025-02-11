@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.1.5
+# 版本: 1.1.6
 
 # 插件基础设置
 settings:
@@ -71,12 +71,6 @@ menus:
 
 # 图标设置
 icons:
-  # 自定义图标存放目录 (使用相对于服务器根目录的路径)
-  custom_path: "plugins/GeyserMenu/icons"
-  
-  # 是否允许使用网络图片作为图标
-  allow_url: true
-  
   # 默认图标 - 当图标加载失败时使用
   default: "paper"  # 不需要 minecraft: 前缀
   
@@ -86,20 +80,15 @@ icons:
     allowed-domains:
       - "i.imgur.com"
       - "mc-heads.net"
-      - "textures.minecraft.net"
+      - "crafatar.com"
+      - "minotar.net"
+      - "visage.surgeplay.com"
     
     # 是否只允许HTTPS链接
     https-only: true
     
     # 图标URL最大长度限制
     max-length: 256
-
-  # 图标加载设置
-  loading:
-    # 连接超时时间(毫秒)
-    connect-timeout: 5000
-    # 读取超时时间(毫秒)
-    read-timeout: 5000
 
 # 安全设置
 security:

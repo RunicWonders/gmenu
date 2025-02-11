@@ -20,10 +20,18 @@ menu:
       icon: "compass"
       submenu: "teleport.yml"
     
-    # 使用网络图片
-    - text: "玩家头像"
-      description: "查看玩家信息"
+    # 使用玩家头像
+    - text: "个人信息"
+      description: "查看个人信息"
       icon: "player_head"
       icon_type: "url"
       icon_path: "https://mc-heads.net/avatar/%player_name%"
       command: "profile %player_name%"
+    
+    # 使用在线状态图标
+    - text: "在线玩家"
+      description: "查看在线玩家列表"
+      icon: "player_head"
+      icon_type: "url"
+      icon_path: "https://minotar.net/helm/%player_name%/32.png"
+      command: "list"

@@ -19,15 +19,10 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import org.apache.commons.io.IOUtils;
 import java.net.URL;
 import java.net.URLConnection;
 import java.io.InputStream;
-import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.io.ByteArrayOutputStream;
-import javax.imageio.ImageIO;
+import java.net.HttpURLConnection;
 
 public class MenuManager {
     private final GeyserMenu plugin;
@@ -186,7 +181,7 @@ public class MenuManager {
                     String icon = getString(item, "icon", plugin.getConfig().getString("icons.default", "paper"));
                     String iconType = getString(item, "icon_type", null);
                     String iconPath = getString(item, "icon_path", null);
-                    FormImage formImage = processIcon(icon, iconType, iconPath);
+                    FormImage formImage = processIcon(player, icon, iconType, iconPath);
 
                     // 添加按钮
                     if (description != null && !description.isEmpty()) {
@@ -426,105 +421,14 @@ public class MenuManager {
         String submenu
     ) {}
 
-    // 将图片转换为Base64编码
-    private String imageToBase64(String imagePath) {
-        try {
-            // 检查路径是否为空
-            if (imagePath == null || imagePath.trim().isEmpty()) {
-                plugin.getLogger().warning("图片路径为空");
-                return null;
-            }
-
-            // 规范化路径
-            File imageFile = new File(imagePath);
-            if (!imageFile.exists()) {
-                plugin.getLogger().warning("图片文件不存在: " + imagePath);
-                return null;
-            }
-
-            // 检查文件是否可读
-            if (!imageFile.canRead()) {
-                plugin.getLogger().warning("无法读取图片文件: " + imagePath);
-                return null;
-            }
-
-            // 检查文件大小
-            if (imageFile.length() > 1024 * 1024) { // 1MB
-                plugin.getLogger().warning("图片文件过大: " + imagePath);
-                return null;
-            }
-
-            // 检查图片尺寸
-            BufferedImage image = ImageIO.read(imageFile);
-            if (image == null) {
-                plugin.getLogger().warning("无法读取图片: " + imagePath);
-                return null;
-            }
-
-            int width = image.getWidth();
-            int height = image.getHeight();
-
-            // 检查尺寸限制
-            if (width > 128 || height > 128) {
-                plugin.getLogger().warning("图片尺寸过大 (" + width + "x" + height + "): " + imagePath);
-                // 自动缩放图片
-                image = resizeImage(image, Math.min(128, width), Math.min(128, height));
-            }
-
-            // 获取MIME类型
-            String mimeType = Files.probeContentType(imageFile.toPath());
-            if (mimeType == null || !mimeType.startsWith("image/")) {
-                mimeType = "image/png";
-            }
-
-            // 转换为Base64
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, mimeType.substring(6), baos);
-            return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(baos.toByteArray());
-
-        } catch (IOException e) {
-            plugin.getLogger().warning("处理图片文件失败: " + imagePath + " - " + e.getMessage());
-            return null;
-        }
-    }
-
-    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-        graphics2D.dispose();
-        return resizedImage;
-    }
-
-    // 添加新的辅助方法来处理图标路径
-    private String resolveIconPath(String iconPath) {
-        try {
-            // 如果是绝对路径，直接返回
-            if (new File(iconPath).isAbsolute()) {
-                return iconPath;
-            }
-
-            // 如果是相对于插件目录的路径
-            if (iconPath.startsWith("plugins/")) {
-                return new File(plugin.getServer().getWorldContainer(), iconPath).getAbsolutePath();
-            }
-
-            // 默认从插件的图标目录加载
-            String customPath = plugin.getConfig().getString("icons.custom_path", "plugins/GeyserMenu/icons");
-            return new File(plugin.getServer().getWorldContainer(), 
-                customPath + File.separator + new File(iconPath).getName()).getAbsolutePath();
-        } catch (Exception e) {
-            plugin.getLogger().warning("解析图标路径失败: " + iconPath + " - " + e.getMessage());
-            return null;
-        }
-    }
-
     // 修改图标处理相关代码
-    private FormImage processIcon(String icon, String iconType, String iconPath) {
+    private FormImage processIcon(Player player, String icon, String iconType, String iconPath) {
         try {
             // 如果指定了URL图标
             if (iconType != null && iconType.equalsIgnoreCase("url") && iconPath != null) {
+                // 处理变量
+                iconPath = parsePlaceholders(player, iconPath);
+                
                 if (!isUrlSafe(iconPath)) {
                     if (plugin.getConfig().getBoolean("settings.debug", false)) {
                         plugin.getLogger().warning("不安全的图标URL: " + iconPath);
@@ -532,15 +436,30 @@ public class MenuManager {
                     return getDefaultFormImage();
                 }
                 
-                // 获取并转换URL图片
-                String base64Image = fetchAndConvertIcon(iconPath);
-                if (base64Image != null) {
-                    return FormImage.of(FormImage.Type.URL, base64Image);
+                // 检查URL是否可访问
+                try {
+                    URL url = new URL(iconPath);
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("HEAD");
+                    conn.setConnectTimeout(3000);
+                    
+                    if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                        if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                            plugin.getLogger().warning("无法访问图标URL: " + iconPath);
+                        }
+                        return getDefaultFormImage();
+                    }
+                    
+                    return FormImage.of(FormImage.Type.URL, iconPath);
+                } catch (Exception e) {
+                    if (plugin.getConfig().getBoolean("settings.debug", false)) {
+                        plugin.getLogger().warning("检查URL可访问性失败: " + iconPath + " - " + e.getMessage());
+                    }
+                    return getDefaultFormImage();
                 }
-                return getDefaultFormImage();
             }
             
-            // 使用 Minecraft/基岩版材质
+            // 使用基岩版材质
             String texturePath = formatMinecraftIcon(icon);
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
                 plugin.getLogger().info("使用材质路径: " + texturePath);
@@ -578,35 +497,19 @@ public class MenuManager {
             URL urlObj = new URL(url);
             String host = urlObj.getHost().toLowerCase();
             List<String> allowedDomains = plugin.getConfig().getStringList("icons.url.allowed-domains");
-            return allowedDomains.stream().anyMatch(host::endsWith);
             
-        } catch (Exception e) {
-            plugin.getLogger().warning("URL安全检查失败: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // 获取并转换URL图片
-    private String fetchAndConvertIcon(String urlString) {
-        try {
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-            connection.setConnectTimeout(plugin.getConfig().getInt("icons.loading.connect-timeout", 5000));
-            connection.setReadTimeout(plugin.getConfig().getInt("icons.loading.read-timeout", 5000));
-            
-            try (InputStream inputStream = connection.getInputStream()) {
-                byte[] imageBytes = IOUtils.toByteArray(inputStream);
-                String mimeType = connection.getContentType();
-                if (mimeType == null) {
-                    mimeType = "image/png";
-                }
-                return "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
+            // 检查域名是否在白名单中
+            boolean allowed = allowedDomains.stream().anyMatch(host::endsWith);
+            if (!allowed && plugin.getConfig().getBoolean("settings.debug", false)) {
+                plugin.getLogger().warning("域名不在白名单中: " + host);
             }
+            return allowed;
+            
         } catch (Exception e) {
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                plugin.getLogger().warning("获取URL图标失败: " + urlString + " - " + e.getMessage());
+                plugin.getLogger().warning("URL安全检查失败: " + e.getMessage());
             }
-            return null;
+            return false;
         }
     }
 
