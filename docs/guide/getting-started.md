@@ -6,7 +6,7 @@
    - Geyser-Spigot
    - Floodgate
 
-2. 下载 GeyserMenu 最新版本
+2. 下载 GeyserMenu v1.1.8
 
 3. 将插件放入服务器的 `plugins` 文件夹
 
@@ -32,22 +32,6 @@ plugins/GeyserMenu/
 :::
 
 ## 配置
-
-插件首次运行会生成以下文件：
-
-```text
-plugins/GeyserMenu/
-├── config.yml      # 主配置文件
-├── messages.yml    # 消息配置文件
-└── menus/          # 菜单文件夹
-    ├── menu.yml    # 主菜单
-    ├── shop.yml    # 商店菜单
-    └── teleport.yml # 传送菜单
-```
-
-::: tip 提示
-配置文件只会在首次启动时生成，之后的修改不会被覆盖。
-:::
 
 ### 基础配置
 
@@ -86,7 +70,7 @@ menu:
 - 每个按钮必须有 text 和 icon
 - command 或 submenu 二选一
 - description 是可选的
-- 图标支持多种格式，详见配置文档
+- 图标必须指定类型 (java 或 bedrock)
 :::
 
 ## 使用方法

@@ -137,13 +137,13 @@ menu:
     - text: "传送菜单"
       description: "打开传送菜单"
       icon: "compass"
-      icon_type: "java"    # 添加图标类型
+      icon_type: "java"      # 必须指定图标类型
       submenu: "teleport.yml"
     
     - text: "商店菜单"
       description: "打开商店菜单"
       icon: "textures/items/diamond"
-      icon_type: "bedrock"  # 添加图标类型
+      icon_type: "bedrock"   # 必须指定图标类型
       submenu: "shop.yml"
     
     - text: "返回出生点"
