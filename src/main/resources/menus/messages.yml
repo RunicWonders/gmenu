@@ -9,17 +9,20 @@ menu:
   items:
     - text: "§c返回主菜单"
       description: "返回到主菜单"
-      icon: "minecraft:arrow"
+      icon: "arrow"
+      icon_type: "java"
       submenu: "menu.yml"
     
     - text: "§a查看未读消息"
       description: "查看你的未读消息"
-      icon: "minecraft:paper"
+      icon: "textures/items/paper"
+      icon_type: "bedrock"
       command: "msg inbox"
       execute_as: "player"
     
     - text: "§b发送新消息"
       description: "给其他玩家发送消息"
-      icon: "minecraft:writable_book"
+      icon: "writable_book"
+      icon_type: "java"
       command: "msg send"
       execute_as: "player" 

@@ -9,7 +9,9 @@
 - 支持多菜单配置
 - 支持无限层级子菜单
 - 支持PlaceholderAPI变量
-- 支持使用Java版物品ID作为按钮图标
+- 支持两种图标类型：
+  - Java版物品ID (使用 `icon_type: "java"`)
+  - 基岭版材质路径 (使用 `icon_type: "bedrock"`)
 
 ### 命令系统
 - 支持三种命令执行方式：
@@ -33,12 +35,30 @@
 - 支持通过config.yml启用/禁用菜单
 - 支持自定义菜单标题和按钮
 - 支持自定义按钮图标和命令
-  - 支持物品ID图标 (例如: `minecraft:diamond`)
-  - 支持URL图标 (使用 `icon_type: "url"`)
-  - 支持自定义路径图标 (使用 `icon_type: "path"` 和 `icon_path`)
+-  - 支持物品ID图标 (例如: `minecraft:diamond`)
+-  - 支持URL图标 (使用 `icon_type: "url"`)
+-  - 支持自定义路径图标 (使用 `icon_type: "path"` 和 `icon_path`)
 - 支持菜单间的相互跳转
 - 支持菜单副标题和简介
 - 支持按钮描述文本
 - 支持表单页脚文本
 - 支持颜色代码 (使用§或&)
 - 支持多行文本 (使用 |- 语法)
+
+## 图标支持
+
+GeyserMenu 支持两种类型的图标：
+
+1. Java 版物品 ID
+   ```yaml
+   icon: "diamond_sword"
+   icon_type: "java"
+   ```
+
+2. 基岭版材质路径
+   ```yaml
+   icon: "textures/items/diamond_sword"
+   icon_type: "bedrock"
+   ```
+
+所有支持的 Java 版物品 ID 都会自动映射到对应的基岭版材质路径。你可以在 config.yml 中添加或修改这些映射。

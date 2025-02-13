@@ -174,7 +174,7 @@ public class MenuManager {
                     String icon = getString(item, "icon", plugin.getConfig().getString("icons.default", "paper"));
                     String iconType = getString(item, "icon_type", null);
                     String iconPath = getString(item, "icon_path", null);
-                    FormImage formImage = processIcon(player, icon, iconType, iconPath);
+                    FormImage formImage = processIcon(player, icon, iconType);
 
                     // 添加按钮
                     if (description != null && !description.isEmpty()) {
@@ -415,31 +415,33 @@ public class MenuManager {
     ) {}
 
     // 修改图标处理相关代码
-    private FormImage processIcon(Player player, String icon, String iconType, String iconPath) {
+    private FormImage processIcon(Player player, String icon, String iconType) {
         try {
-            // 如果指定了URL图标
-            if (iconType != null && iconType.equalsIgnoreCase("url") && iconPath != null) {
-                // 处理变量
-                iconPath = parsePlaceholders(player, iconPath);
-                
-                if (!isUrlSafe(iconPath)) {
-                    if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                        plugin.getLogger().warning("不安全的图标URL: " + iconPath);
+            // 如果指定了图标类型
+            if (iconType != null) {
+                switch (iconType.toLowerCase()) {
+                    case "java" -> {
+                        // 使用映射转换Java版材质路径到基岩版
+                        String bedrockPath = plugin.getConfig().getString("icons.mappings." + icon.toLowerCase());
+                        if (bedrockPath != null) {
+                            return FormImage.of(FormImage.Type.PATH, bedrockPath);
+                        }
                     }
-                    return getDefaultFormImage();
+                    case "bedrock" -> {
+                        // 直接使用基岩版材质路径
+                        return FormImage.of(FormImage.Type.PATH, icon);
+                    }
                 }
-                
-                // 直接返回URL,让客户端处理图片加载
-                return FormImage.of(FormImage.Type.URL, iconPath);
             }
             
-            // 使用基岩版材质
-            String texturePath = formatMinecraftIcon(icon);
-            if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                plugin.getLogger().info("使用材质路径: " + texturePath);
+            // 默认尝试作为Java版材质处理
+            String bedrockPath = plugin.getConfig().getString("icons.mappings." + icon.toLowerCase());
+            if (bedrockPath != null) {
+                return FormImage.of(FormImage.Type.PATH, bedrockPath);
             }
-            return FormImage.of(FormImage.Type.PATH, texturePath);
             
+            // 如果没有映射，使用默认图标
+            return getDefaultFormImage();
         } catch (Exception e) {
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
                 plugin.getLogger().warning("处理图标时出错: " + e.getMessage());
@@ -448,95 +450,9 @@ public class MenuManager {
         }
     }
 
-    // URL安全检查
-    private boolean isUrlSafe(String url) {
-        try {
-            if (url == null || url.isEmpty()) {
-                return false;
-            }
-            
-            // 检查URL长度
-            int maxLength = plugin.getConfig().getInt("icons.url.max-length", 256);
-            if (url.length() > maxLength) {
-                return false;
-            }
-            
-            // 检查是否需要HTTPS
-            if (plugin.getConfig().getBoolean("icons.url.https-only", true) 
-                && !url.toLowerCase().startsWith("https://")) {
-                return false;
-            }
-            
-            // 检查域名白名单
-            URL urlObj = new URL(url);
-            String host = urlObj.getHost().toLowerCase();
-            List<String> allowedDomains = plugin.getConfig().getStringList("icons.url.allowed-domains");
-            
-            // 检查域名是否在白名单中
-            boolean allowed = allowedDomains.stream().anyMatch(host::endsWith);
-            if (!allowed && plugin.getConfig().getBoolean("settings.debug", false)) {
-                plugin.getLogger().warning("域名不在白名单中: " + host);
-            }
-            return allowed;
-            
-        } catch (Exception e) {
-            if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                plugin.getLogger().warning("URL安全检查失败: " + e.getMessage());
-            }
-            return false;
-        }
-    }
-
     private FormImage getDefaultFormImage() {
-        String defaultIcon = plugin.getConfig().getString("icons.default", "paper");
-        String texturePath = formatMinecraftIcon(defaultIcon);
-        if (plugin.getConfig().getBoolean("settings.debug", false)) {
-            plugin.getLogger().info("使用默认图标: " + texturePath);
-        }
-        return FormImage.of(FormImage.Type.PATH, texturePath);
-    }
-
-    // 修改 formatMinecraftIcon 方法，确保返回基岩版可识别的材质路径
-    private String formatMinecraftIcon(String icon) {
-        if (icon == null || icon.isEmpty()) {
-            return "textures/items/" + getDefaultIcon();
-        }
-        
-        // 移除 minecraft: 前缀
-        icon = icon.replace("minecraft:", "");
-        
-        // 如果已经包含完整路径，直接返回
-        if (icon.startsWith("textures/")) {
-            return icon;
-        }
-        
-        // 基岭版材质路径映射
-        return switch (icon.toLowerCase()) {
-            // 方块
-            case "grass_block", "grass" -> "textures/blocks/grass_side";
-            case "stone" -> "textures/blocks/stone";
-            case "dirt" -> "textures/blocks/dirt";
-            case "diamond_block" -> "textures/blocks/diamond_block";
-            case "oak_log" -> "textures/blocks/log_oak";
-            case "oak_planks" -> "textures/blocks/planks_oak";
-            
-            // 物品
-            case "diamond" -> "textures/items/diamond";
-            case "diamond_sword" -> "textures/items/diamond_sword";
-            case "diamond_pickaxe" -> "textures/items/diamond_pickaxe";
-            case "compass" -> "textures/items/compass_item";
-            case "clock" -> "textures/items/clock_item";
-            case "paper" -> "textures/items/paper";
-            case "book" -> "textures/items/book_normal";
-            case "writable_book" -> "textures/items/book_writable";
-            case "written_book" -> "textures/items/book_written";
-            case "nether_star" -> "textures/items/nether_star";
-            case "arrow" -> "textures/items/arrow";
-            case "chest" -> "textures/blocks/chest_front";
-            
-            // 默认为物品路径
-            default -> "textures/items/" + icon;
-        };
+        String defaultIcon = plugin.getConfig().getString("icons.default", "textures/items/paper");
+        return FormImage.of(FormImage.Type.PATH, defaultIcon);
     }
 
     /**
@@ -545,9 +461,5 @@ public class MenuManager {
      */
     public List<String> getMenuList() {
         return new ArrayList<>(menus.keySet());
-    }
-
-    private String getDefaultIcon() {
-        return plugin.getConfig().getString("icons.default", "paper");
     }
 }

@@ -5,14 +5,17 @@ menu:
   items:
     - text: "§c返回上级菜单"
       icon: "arrow"
+      icon_type: "java"
       submenu: "menu.yml"
     
     - text: "§e传送到矿区"
       icon: "diamond_pickaxe"
+      icon_type: "java"
       command: "warp mine"
       execute_as: "player"
     
     - text: "§a传送到农场"
-      icon: "wheat"
+      icon: "textures/items/wheat"
+      icon_type: "bedrock"
       command: "warp farm"
-      execute_as: "player" 
+      execute_as: "player"

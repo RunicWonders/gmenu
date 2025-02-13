@@ -20,7 +20,6 @@
 plugins/GeyserMenu/
 ├── config.yml      # 主配置文件
 ├── messages.yml    # 消息配置文件
-├── icons/          # 自定义图标目录
 └── menus/          # 菜单文件夹
     ├── menu.yml    # 主菜单
     ├── shop.yml    # 商店菜单
@@ -29,7 +28,6 @@ plugins/GeyserMenu/
 
 ::: tip 提示
 - 配置文件只会在首次启动时生成，之后的修改不会被覆盖
-- 自定义图标请放在 icons 目录下
 - 菜单文件请放在 menus 目录下
 :::
 
@@ -41,7 +39,6 @@ plugins/GeyserMenu/
 plugins/GeyserMenu/
 ├── config.yml      # 主配置文件
 ├── messages.yml    # 消息配置文件
-├── icons/          # 自定义图标目录
 └── menus/          # 菜单文件夹
     ├── menu.yml    # 主菜单
     ├── shop.yml    # 商店菜单
@@ -75,11 +72,13 @@ menu:
     - text: "传送菜单"
       description: "打开传送菜单"
       icon: "compass"
+      icon_type: "java"     # 使用 Java 版物品 ID
       submenu: "teleport.yml"
     
     - text: "执行命令"
       description: "点击执行命令"
-      icon: "diamond"
+      icon: "textures/items/diamond"
+      icon_type: "bedrock"  # 使用基岭版材质路径
       command: "say 你好"
 ```
 

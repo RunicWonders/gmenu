@@ -18,7 +18,6 @@ error:
   placeholder-error: "§c处理变量时出错!"
   unknown-command: "§c未知的命令，使用 /gmenu help 查看帮助"
   no-menu-permission: "§c你没有权限使用此菜单!"
-  url-blocked: "§c此图标URL已被禁用!"
   command-blocked: "§c此命令已被禁用!"
 
 command:

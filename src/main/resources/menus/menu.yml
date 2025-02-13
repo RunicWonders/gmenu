@@ -14,16 +14,16 @@ menu:
   
   # 菜单按钮列表
   items:
-    # 使用基岩版材质
+    # 使用 Java 版物品 ID
     - text: "传送菜单"
       description: "打开传送菜单"
       icon: "compass"
+      icon_type: "java"
       submenu: "teleport.yml"
     
-    # 使用玩家头像
-    - text: "个人信息"
-      description: "查看个人信息"
-      icon: "player_head"
-      icon_type: "url"
-      icon_path: "https://mc-heads.net/avatar/%player_name%"
-      command: "profile %player_name%"
+    # 使用基岭版材质路径
+    - text: "商店菜单"
+      description: "打开商店菜单"
+      icon: "textures/items/diamond"
+      icon_type: "bedrock"
+      submenu: "shop.yml"

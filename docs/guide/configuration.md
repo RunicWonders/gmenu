@@ -37,51 +37,64 @@ security:
 
 GeyserMenu 支持两种类型的图标：
 
-1. 基岩版材质图标
-   - 直接使用物品ID
-   - 自动映射到基岭版材质路径
-   - 不需要网络请求，性能最好
+### 1. Java 版物品 ID
+使用 Java 版的物品 ID，会自动转换为对应的基岩版材质路径：
 
-2. 网络图片图标
-   - 支持动态URL（可包含变量）
-   - 必须来自白名单域名
-   - 仅支持HTTPS链接
-   - 建议使用可靠的图片服务
+```yaml
+items:
+  - text: "传送菜单"
+    icon: "compass"      # Java版物品ID
+    icon_type: "java"    # 指定使用Java版图标
+```
 
-推荐的头像服务：
-- mc-heads.net (推荐)
-- minotar.net
-- crafatar.com
-- visage.surgeplay.com
+### 2. 基岭版材质路径
+直接使用基岭版的材质路径：
 
-::: warning 注意
-- 网络图片必须来自允许的域名
-- 仅支持 HTTPS 链接
-- URL 支持变量替换
-:::
+```yaml
+items:
+  - text: "商店菜单"
+    icon: "textures/items/diamond"    # 基岭版材质路径
+    icon_type: "bedrock"             # 指定使用基岭版图标
+```
 
-#### 图标安全设置
+### 图标映射配置
 
-在 config.yml 中配置图标相关安全选项：
+在 config.yml 中配置 Java 版到基岭版的材质映射：
 
 ```yaml
 icons:
   # 默认图标
-  default: "paper"
+  default: "textures/items/paper"
   
-  # 网络图标设置
-  url:
-    # 允许的域名
-    allowed-domains:
-      - "i.imgur.com"
-      - "mc-heads.net"
+  # 图标类型映射 (Java版 -> 基岭版)
+  mappings:
+    # 方块
+    grass_block: "textures/blocks/grass_side"
+    stone: "textures/blocks/stone"
+    dirt: "textures/blocks/dirt"
     
-    # 是否只允许HTTPS
-    https-only: true
-    
-    # URL最大长度
-    max-length: 256
+    # 物品
+    diamond: "textures/items/diamond"
+    compass: "textures/items/compass_item"
+    book: "textures/items/book_normal"
 ```
+
+### 使用建议
+
+1. 如果你熟悉 Java 版物品 ID，使用 `icon_type: "java"`
+2. 如果你需要使用特定的基岭版材质，使用 `icon_type: "bedrock"`
+3. 如果没有指定 `icon_type`，默认会尝试作为 Java 版物品 ID 处理
+
+::: tip 提示
+- Java 版物品 ID 不需要包含 `minecraft:` 前缀
+- 基岭版材质路径必须是完整的材质路径
+- 可以在配置文件中添加新的材质映射
+- 图标类型必须通过 icon_type 指定 ("java" 或 "bedrock")
+:::
+
+::: warning 注意
+如果 Java 版物品 ID 没有对应的映射，将使用默认图标
+:::
 
 ## 消息配置
 
@@ -124,23 +137,26 @@ menu:
     - text: "传送菜单"
       description: "打开传送菜单"
       icon: "compass"
+      icon_type: "java"    # 添加图标类型
       submenu: "teleport.yml"
     
     - text: "商店菜单"
       description: "打开商店菜单"
-      icon: "diamond"
+      icon: "textures/items/diamond"
+      icon_type: "bedrock"  # 添加图标类型
       submenu: "shop.yml"
     
     - text: "返回出生点"
       description: "点击传送到出生点"
       icon: "nether_star"
+      icon_type: "java"    # 添加图标类型
       command: "spawn"
 ```
 
 ::: tip 提示
 - 所有文本支持颜色代码 (使用 & 符号)
 - 支持 PlaceholderAPI 变量
-- 图标不需要 minecraft: 前缀
+- 图标类型必须通过 icon_type 指定 ("java" 或 "bedrock")
 :::
 
 ## 配置保存
@@ -156,13 +172,6 @@ menu:
 ::: 
 
 ## 目录说明
-
-### 图标目录
-
-`icons` 目录用于存放自定义图标：
-- 支持 PNG、JPG 格式的图片
-- 图片大小建议不超过 128x128
-- 文件名不要包含特殊字符
 
 ### 菜单目录
 

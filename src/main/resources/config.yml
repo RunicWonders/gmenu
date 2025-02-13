@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.1.6
+# 版本: 1.1.8
 
 # 插件基础设置
 settings:
@@ -72,24 +72,31 @@ menus:
 # 图标设置
 icons:
   # 默认图标
-  default: "paper"
+  default: "textures/items/paper"
   
-  # 网络图标设置
-  url:
-    # 允许的域名
-    allowed-domains:
-      - "i.imgur.com"
-      - "mc-heads.net"
-      - "crafatar.com"
-      - "minotar.net"
-      - "visage.surgeplay.com"
-      - "textures.minecraft.net"
+  # 图标类型映射 (Java版 -> 基岩版)
+  mappings:
+    # 方块
+    grass_block: "textures/blocks/grass_side"
+    stone: "textures/blocks/stone"
+    dirt: "textures/blocks/dirt"
+    diamond_block: "textures/blocks/diamond_block"
+    oak_log: "textures/blocks/log_oak"
+    oak_planks: "textures/blocks/planks_oak"
     
-    # 是否只允许HTTPS
-    https-only: true
-    
-    # URL最大长度限制
-    max-length: 256
+    # 物品
+    diamond: "textures/items/diamond"
+    diamond_sword: "textures/items/diamond_sword"
+    diamond_pickaxe: "textures/items/diamond_pickaxe"
+    compass: "textures/items/compass_item"
+    clock: "textures/items/clock_item"
+    paper: "textures/items/paper"
+    book: "textures/items/book_normal"
+    writable_book: "textures/items/book_writable"
+    written_book: "textures/items/book_written"
+    nether_star: "textures/items/nether_star"
+    arrow: "textures/items/arrow"
+    chest: "textures/blocks/chest_front"
 
 # 安全设置
 security:
@@ -121,5 +128,4 @@ messages:
   error:
     no-menu-permission: "§c你没有权限使用此菜单!"
     invalid-menu: "§c无效的菜单配置!"
-    url-blocked: "§c此图标URL已被禁用!"
     command-blocked: "§c此命令已被禁用!"
