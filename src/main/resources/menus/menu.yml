@@ -27,11 +27,3 @@ menu:
       icon_type: "url"
       icon_path: "https://mc-heads.net/avatar/%player_name%"
       command: "profile %player_name%"
-    
-    # 使用在线状态图标
-    - text: "在线玩家"
-      description: "查看在线玩家列表"
-      icon: "player_head"
-      icon_type: "url"
-      icon_path: "https://minotar.net/helm/%player_name%/32.png"
-      command: "list"

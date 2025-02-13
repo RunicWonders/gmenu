@@ -71,23 +71,24 @@ menus:
 
 # 图标设置
 icons:
-  # 默认图标 - 当图标加载失败时使用
-  default: "paper"  # 不需要 minecraft: 前缀
+  # 默认图标
+  default: "paper"
   
-  # 网络图标安全设置
+  # 网络图标设置
   url:
-    # 允许加载图标的域名白名单
+    # 允许的域名
     allowed-domains:
       - "i.imgur.com"
       - "mc-heads.net"
       - "crafatar.com"
       - "minotar.net"
       - "visage.surgeplay.com"
+      - "textures.minecraft.net"
     
-    # 是否只允许HTTPS链接
+    # 是否只允许HTTPS
     https-only: true
     
-    # 图标URL最大长度限制
+    # URL最大长度限制
     max-length: 256
 
 # 安全设置

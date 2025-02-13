@@ -14,15 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.geysermc.cumulus.response.SimpleFormResponse;
 import org.geysermc.cumulus.util.FormImage;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Base64;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.net.URL;
-import java.net.URLConnection;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 
 public class MenuManager {
     private final GeyserMenu plugin;
@@ -436,27 +429,8 @@ public class MenuManager {
                     return getDefaultFormImage();
                 }
                 
-                // 检查URL是否可访问
-                try {
-                    URL url = new URL(iconPath);
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.setRequestMethod("HEAD");
-                    conn.setConnectTimeout(3000);
-                    
-                    if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                        if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                            plugin.getLogger().warning("无法访问图标URL: " + iconPath);
-                        }
-                        return getDefaultFormImage();
-                    }
-                    
-                    return FormImage.of(FormImage.Type.URL, iconPath);
-                } catch (Exception e) {
-                    if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                        plugin.getLogger().warning("检查URL可访问性失败: " + iconPath + " - " + e.getMessage());
-                    }
-                    return getDefaultFormImage();
-                }
+                // 直接返回URL,让客户端处理图片加载
+                return FormImage.of(FormImage.Type.URL, iconPath);
             }
             
             // 使用基岩版材质

@@ -49,7 +49,7 @@ GeyserMenu 支持两种类型的图标：
    - 建议使用可靠的图片服务
 
 推荐的头像服务：
-- mc-heads.net
+- mc-heads.net (推荐)
 - minotar.net
 - crafatar.com
 - visage.surgeplay.com
