@@ -82,9 +82,11 @@ public class MenuManager {
     }
     
     public void openMenu(Player player, String menuName) {
+        // 将 now 变量移到方法作用域
+        long now = System.currentTimeMillis();
+        
         try {
             // 检查表单冷却
-            long now = System.currentTimeMillis();
             Long lastOpen = formCooldowns.get(player.getUniqueId());
             if (lastOpen != null && now - lastOpen < FORM_COOLDOWN) {
                 // 如果冷却中则忽略请求
