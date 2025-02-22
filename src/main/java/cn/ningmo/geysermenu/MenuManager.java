@@ -16,12 +16,15 @@ import org.geysermc.cumulus.response.SimpleFormResponse;
 import org.geysermc.cumulus.util.FormImage;
 import java.util.ArrayList;
 import java.net.URL;
+import java.util.UUID;
 
 public class MenuManager {
     private final GeyserMenu plugin;
     private final Map<String, YamlConfiguration> menus;
     private final Map<String, String> placeholderCache; // 用于PAPI变量缓存
     private long lastCacheRefresh; // 缓存刷新时间记录
+    private final Map<UUID, Long> formCooldowns = new HashMap<>();
+    private static final long FORM_COOLDOWN = 500; // 500ms冷却时间
 
     public MenuManager(GeyserMenu plugin) {
         this.plugin = plugin;
@@ -80,6 +83,20 @@ public class MenuManager {
     
     public void openMenu(Player player, String menuName) {
         try {
+            // 检查表单冷却
+            long now = System.currentTimeMillis();
+            Long lastOpen = formCooldowns.get(player.getUniqueId());
+            if (lastOpen != null && now - lastOpen < FORM_COOLDOWN) {
+                // 如果冷却中则忽略请求
+                if (plugin.getConfig().getBoolean("settings.debug")) {
+                    plugin.getLogger().info("玩家 " + player.getName() + " 打开菜单过快,请求被忽略");
+                }
+                return;
+            }
+            
+            // 更新最后打开时间
+            formCooldowns.put(player.getUniqueId(), now);
+            
             // 参数检查
             if (player == null || menuName == null) {
                 plugin.getLogger().warning("无效的参数: player=" + player + ", menuName=" + menuName);
@@ -224,6 +241,10 @@ public class MenuManager {
             plugin.getLogger().severe("打开菜单时出错: " + e.getMessage());
             e.printStackTrace();
             player.sendMessage(plugin.getMessage("error.form-error"));
+        } finally {
+            // 清理过期的冷却记录
+            formCooldowns.entrySet().removeIf(entry -> 
+                now - entry.getValue() > FORM_COOLDOWN * 2);
         }
     }
     

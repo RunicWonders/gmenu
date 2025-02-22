@@ -19,6 +19,7 @@ error:
   unknown-command: "§c未知的命令，使用 /gmenu help 查看帮助"
   no-menu-permission: "§c你没有权限使用此菜单!"
   command-blocked: "§c此命令已被禁用!"
+  form-cooldown: "§c请不要太快打开菜单!"
 
 command:
   usage: "§c用法: {0}"

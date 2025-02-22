@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.1.8
+# 版本: 1.1.9
 
 # 插件基础设置
 settings:
@@ -26,6 +26,12 @@ settings:
     
     # 是否在重载时清除缓存
     clear-cache-on-reload: true
+    
+    # 表单打开冷却时间(毫秒)
+    form-cooldown: 500
+    
+    # 是否在调试模式下记录表单冷却信息
+    log-form-cooldown: false
     
   # 命令安全检查 - 防止执行危险命令
   enable-command-security: true
