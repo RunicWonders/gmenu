@@ -55,10 +55,10 @@ GeyserMenu 支持两种类型的图标：
    icon_type: "java"
    ```
 
-2. 基岭版材质路径
+2. 基岩版材质路径
    ```yaml
    icon: "textures/items/diamond_sword"
    icon_type: "bedrock"
    ```
 
-所有支持的 Java 版物品 ID 都会自动映射到对应的基岭版材质路径。你可以在 config.yml 中添加或修改这些映射。
+所有支持的 Java 版物品 ID 都会自动映射到对应的基岩版材质路径。你可以在 config.yml 中添加或修改这些映射。
