@@ -149,8 +149,7 @@ public class GeyserMenu extends JavaPlugin {
     
     private boolean checkDependencies() {
         try {
-            return getServer().getPluginManager().getPlugin("Geyser-Spigot") != null 
-                && getServer().getPluginManager().getPlugin("floodgate") != null;
+            return getServer().getPluginManager().getPlugin("floodgate") != null;
         } catch (Exception e) {
             getLogger().severe("检查依赖时发生错误: " + e.getMessage());
             return false;
