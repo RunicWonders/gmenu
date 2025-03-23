@@ -12,10 +12,8 @@ import java.util.List;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.geysermc.cumulus.response.SimpleFormResponse;
 import org.geysermc.cumulus.util.FormImage;
 import java.util.ArrayList;
-import java.net.URL;
 import java.util.UUID;
 
 public class MenuManager {

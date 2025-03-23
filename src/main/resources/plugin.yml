@@ -3,7 +3,7 @@ version: '1.1.9'
 main: cn.ningmo.geysermenu.GeyserMenu
 author: 柠枺
 api-version: '1.21'
-depend: [Geyser-Spigot, floodgate]
+depend: [floodgate]
 softdepend: [PlaceholderAPI]
 description: 一个轻量化且简单的基岩版自定义表单插件
 
