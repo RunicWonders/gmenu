@@ -49,4 +49,13 @@ update:
     available: "§e发现新版本 v{0} 可用"
     current: "§7当前版本: v{1}"
     download: "§6下载地址: §f{0}"
-    click-to-download: "§a点击打开下载页面" 
+    click-to-download: "§a点击打开下载页面"
+
+statistics:
+  # BStats 统计相关消息
+  console:
+    enabled: "BStats 统计已启用"
+    disabled: "BStats 统计已禁用"
+    init-error: "初始化 BStats 统计时发生错误: {0}"
+    shutdown: "BStats 统计已关闭"
+    shutdown-error: "关闭 BStats 统计时发生错误: {0}"

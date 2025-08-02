@@ -14,6 +14,7 @@ public class GeyserMenu extends JavaPlugin {
     private static GeyserMenu instance;
     private MenuManager menuManager;
     private YamlConfiguration messages;
+    private BStatsManager bStatsManager;
     
     // 添加更新检查相关字段
     private static final String UPDATE_URL = "https://api.github.com/repos/ning-g-mo/gmenu/releases/latest";
@@ -72,6 +73,10 @@ public class GeyserMenu extends JavaPlugin {
                 return;
             }
             
+            // 初始化 BStats 统计
+            bStatsManager = new BStatsManager(this);
+            bStatsManager.initialize();
+            
             getLogger().info("GeyserMenu v" + getDescription().getVersion() + " 已成功加载!");
         } catch (Exception e) {
             getLogger().severe("插件加载时发生错误: " + e.getMessage());
@@ -90,6 +95,11 @@ public class GeyserMenu extends JavaPlugin {
             
             // 取消所有任务
             Bukkit.getScheduler().cancelTasks(this);
+            
+            // 关闭 BStats 统计
+            if (bStatsManager != null) {
+                bStatsManager.shutdown();
+            }
             
             // 清除实例
             instance = null;
@@ -206,6 +216,10 @@ public class GeyserMenu extends JavaPlugin {
             throw new IllegalStateException("菜单管理器未初始化!");
         }
         return menuManager;
+    }
+    
+    public BStatsManager getBStatsManager() {
+        return bStatsManager;
     }
     
     public String getPrefix() {

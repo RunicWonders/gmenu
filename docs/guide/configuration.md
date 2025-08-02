@@ -17,6 +17,21 @@ performance:
   max-cache-size: 1000
 ```
 
+### 统计设置
+
+```yaml
+statistics:
+  # 是否启用 BStats 统计
+  enable-bstats: true
+  
+  # 是否收集自定义统计数据
+  collect-custom-data: true
+```
+
+::: tip 提示
+关于统计功能的详细说明，请参阅 [统计功能](./statistics.md) 文档。
+:::
+
 ### 安全设置
 
 ```yaml
@@ -47,15 +62,19 @@ items:
     icon_type: "java"    # 指定使用Java版图标
 ```
 
-### 2. 基岭版材质路径
-直接使用基岭版的材质路径：
+### 2. 基岩版材质路径
+直接使用基岩版的材质路径：
 
 ```yaml
 items:
   - text: "商店菜单"
-    icon: "textures/items/diamond"    # 基岭版材质路径
+    icon: "textures/items/diamond"    # 基岩版材质路径
     icon_type: "bedrock"             # 指定使用基岭版图标
 ```
+
+::: warning 重要提示
+从版本 1.1.0 开始，必须通过 `icon_type` 属性明确指定图标类型（"java" 或 "bedrock"）。这是为了避免图标显示错误和提高性能。
+:::
 
 ### 图标映射配置
 
@@ -159,6 +178,59 @@ menu:
 - 图标类型必须通过 icon_type 指定 ("java" 或 "bedrock")
 :::
 
+### 菜单类型
+
+GeyserMenu 支持多种菜单类型，通过不同的配置实现：
+
+#### 1. 子菜单类型
+
+通过 `submenu` 属性打开另一个菜单文件：
+
+```yaml
+items:
+  - text: "传送菜单"
+    description: "打开传送菜单"
+    icon: "compass"
+    icon_type: "java"
+    submenu: "teleport.yml"  # 点击后打开teleport.yml菜单
+```
+
+#### 2. 命令执行类型
+
+通过 `command` 属性执行指定命令：
+
+```yaml
+items:
+  - text: "返回出生点"
+    description: "点击传送到出生点"
+    icon: "nether_star"
+    icon_type: "java"
+    command: "spawn"  # 点击后执行spawn命令
+```
+
+#### 3. 命令执行方式
+
+通过 `execute_as` 属性指定命令的执行方式：
+
+```yaml
+items:
+  - text: "获取钻石"
+    description: "获得一个钻石"
+    icon: "diamond"
+    icon_type: "java"
+    command: "give {player} diamond 1"
+    execute_as: "console"  # 以控制台身份执行命令
+```
+
+可用的执行方式：
+- `player`: 以玩家身份执行命令（默认）
+- `console`: 以控制台身份执行命令
+- `op`: 临时给予玩家OP权限执行命令
+
+::: warning 安全提示
+使用 `console` 或 `op` 执行方式时要特别小心，确保命令不会被滥用。建议在 config.yml 中配置 `blocked-commands` 列表，禁止执行危险命令。
+:::
+
 ## 配置保存
 
 配置文件的保存和重载机制：
@@ -178,4 +250,4 @@ menu:
 `menus` 目录用于存放菜单配置文件：
 - 使用 YAML 格式
 - 文件名即为菜单名
-- 支持子目录组织菜单 
+- 支持子目录组织菜单

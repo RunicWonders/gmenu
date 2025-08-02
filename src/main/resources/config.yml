@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.1.10
+# 版本: 1.2.0
 
 # 插件基础设置
 settings:
@@ -46,6 +46,14 @@ settings:
     
     # 是否只通知管理员
     notify-ops-only: false
+  
+  # 统计设置
+  statistics:
+    # 是否启用 BStats 统计 - 帮助开发者了解插件使用情况
+    enable-bstats: true
+    
+    # 是否收集自定义统计数据
+    collect-custom-data: true
 
 # 菜单配置 - 在这里定义所有可用的菜单
 menus:

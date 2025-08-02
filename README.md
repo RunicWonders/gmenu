@@ -18,7 +18,7 @@
 - 支持PlaceholderAPI变量
 - 支持两种图标类型：
   - Java版物品ID (使用 `icon_type: "java"`)
-  - 基岩版材质路径 (使用 `icon_type: "bedrock"`)
+  - 基岭版材质路径 (使用 `icon_type: "bedrock"`)
 - 集成 BStats 统计功能（可配置）
 
 ### 命令系统
