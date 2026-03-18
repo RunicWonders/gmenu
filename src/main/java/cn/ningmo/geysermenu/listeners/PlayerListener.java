@@ -5,10 +5,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 
 public class PlayerListener implements Listener {
 
@@ -34,17 +33,16 @@ public class PlayerListener implements Listener {
                 player.sendMessage(plugin.getMessage("update.player.available", 
                     plugin.getLatestVersion()));
                 player.sendMessage(plugin.getMessage("update.player.current", 
-                    plugin.getDescription().getVersion()));
+                    plugin.getPluginMeta().getVersion()));
                     
                 // 发送可点击的下载链接
-                TextComponent message = new TextComponent(
+                Component message = Component.text(
                     plugin.getMessage("update.player.download", 
-                        "https://github.com/ning-g-mo/gmenu/releases/latest"));
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, 
-                    "https://github.com/ning-g-mo/gmenu/releases/latest"));
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
-                    new Text(plugin.getMessage("update.player.click-to-download"))));
-                player.spigot().sendMessage(message);
+                        "https://github.com/ning-g-mo/gmenu/releases/latest"))
+                    .clickEvent(ClickEvent.openUrl("https://github.com/ning-g-mo/gmenu/releases/latest"))
+                    .hoverEvent(HoverEvent.showText(Component.text(
+                        plugin.getMessage("update.player.click-to-download"))));
+                player.sendMessage(message);
             }
         }
     }

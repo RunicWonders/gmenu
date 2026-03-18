@@ -1,0 +1,16 @@
+menu:
+  type: modal
+  title: "§c确认操作"
+  content: |-
+    §f你确定要执行此操作吗？
+    §7此操作无法撤销！
+    
+    §e点击确认继续
+    §7点击取消返回
+  button1: "§a确认"
+  button2: "§c取消"
+  on_button1:
+    command: "say {player} 确认了操作"
+    execute_as: console
+  on_button2:
+    submenu: "menu.yml"

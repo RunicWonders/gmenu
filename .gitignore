@@ -4,3 +4,6 @@ target
 geysermenu.iml
 gm.iml
 dependency-reduced-pom.xml
+
+.trae/
+paper-api*/

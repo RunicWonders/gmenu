@@ -5,7 +5,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import org.bukkit.Bukkit;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.json.JSONObject;
@@ -46,6 +46,8 @@ public class GeyserMenu extends JavaPlugin {
             saveResource("menus/menu.yml", false);
             saveResource("menus/shop.yml", false);
             saveResource("menus/teleport.yml", false);
+            saveResource("menus/confirm.yml", false);
+            saveResource("menus/settings.yml", false);
             
             // 创建必要的目录
             createDirectories();
@@ -77,7 +79,7 @@ public class GeyserMenu extends JavaPlugin {
             bStatsManager = new BStatsManager(this);
             bStatsManager.initialize();
             
-            getLogger().info("GeyserMenu v" + getDescription().getVersion() + " 已成功加载!");
+            getLogger().info("GeyserMenu v" + getPluginMeta().getVersion() + " 已成功加载!");
         } catch (Exception e) {
             getLogger().severe("插件加载时发生错误: " + e.getMessage());
             e.printStackTrace();
@@ -252,8 +254,8 @@ public class GeyserMenu extends JavaPlugin {
         
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
             try {
-                URL url = new URL(UPDATE_URL);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                URI uri = new URI(UPDATE_URL);
+                HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(5000);
                 conn.setReadTimeout(5000);
@@ -272,7 +274,7 @@ public class GeyserMenu extends JavaPlugin {
                         String tagName = json.getString("tag_name");
                         if (tagName.startsWith("v")) {
                             latestVersion = tagName.substring(1);
-                            String currentVersion = getDescription().getVersion();
+                            String currentVersion = getPluginMeta().getVersion();
                             
                             if (!currentVersion.equals(latestVersion)) {
                                 updateAvailable = true;

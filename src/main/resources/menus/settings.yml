@@ -1,0 +1,38 @@
+menu:
+  type: custom
+  title: "§b玩家设置"
+  components:
+    - type: label
+      text: "§f=== 玩家设置面板 ==="
+    
+    - type: dropdown
+      text: "选择语言"
+      options:
+        - "简体中文"
+        - "English"
+        - "日本語"
+      default: 0
+    
+    - type: toggle
+      text: "接收私聊消息"
+      default: true
+    
+    - type: toggle
+      text: "显示成就提示"
+      default: true
+    
+    - type: slider
+      text: "渲染距离"
+      min: 2
+      max: 32
+      step: 2
+      default: 12
+    
+    - type: input
+      text: "自定义昵称"
+      placeholder: "输入你的昵称"
+      default: "{player}"
+  
+  on_submit:
+    command: "say {player} 设置已保存: 语言={0}, 私聊={1}, 成就={2}, 渲染距离={3}, 昵称={4}"
+    execute_as: console

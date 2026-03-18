@@ -5,9 +5,19 @@
 ## 最新版本：v1.2.0
 
 ### 更新内容
+- 更新依赖到 Paper API 1.21.4+
+- 迁移 Chat API 到 Adventure (Kyori)
+- 更新 bStats 到 3.2.1
+- 更新 org.json 到 20250107
 - 完善菜单类型和权限配置文档
 - 优化菜单配置说明
 - 修正文档中的术语（"基岭版"统一修正为"基岩版"）
+
+## 环境要求
+
+- Minecraft 服务器: Paper 1.21.4 或更高版本
+- Java: 21 或更高版本
+- 前置插件: Floodgate
 
 ## 功能特性
 
@@ -18,7 +28,7 @@
 - 支持PlaceholderAPI变量
 - 支持两种图标类型：
   - Java版物品ID (使用 `icon_type: "java"`)
-  - 基岭版材质路径 (使用 `icon_type: "bedrock"`)
+  - 基岩版材质路径 (使用 `icon_type: "bedrock"`)
 - 集成 BStats 统计功能（可配置）
 
 ### 命令系统
