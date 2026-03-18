@@ -1,82 +1,82 @@
-# 快速上手
+# Quick Start
 
-## 安装
+## Installation
 
-1. 确保你的服务器已经安装了必需的前置插件：
+1. Make sure your server has the required dependencies installed:
    - Geyser-Spigot
    - Floodgate
 
-2. 下载 GeyserMenu v1.1.8
+2. Download GeyserMenu v1.3.0-beta1
 
-3. 将插件放入服务器的 `plugins` 文件夹
+3. Place the plugin in your server's `plugins` folder
 
-4. 重启服务器
+4. Restart the server
 
-## 目录结构
+## Directory Structure
 
-插件首次运行会生成以下目录和文件：
+The plugin will generate the following directories and files on first run:
 
 ```text
 plugins/GeyserMenu/
-├── config.yml      # 主配置文件
-├── messages.yml    # 消息配置文件
-└── menus/          # 菜单文件夹
-    ├── menu.yml    # 主菜单
-    ├── shop.yml    # 商店菜单
-    └── teleport.yml # 传送菜单
+├── config.yml      # Main configuration file
+├── messages.yml    # Message configuration file
+└── menus/          # Menu folder
+    ├── menu.yml    # Main menu
+    ├── shop.yml    # Shop menu
+    └── teleport.yml # Teleport menu
 ```
 
-::: tip 提示
-- 配置文件只会在首次启动时生成，之后的修改不会被覆盖
-- 菜单文件请放在 menus 目录下
+::: tip Note
+- Configuration files are only generated on first startup, subsequent modifications will not be overwritten
+- Menu files should be placed in the menus directory
 :::
 
-## 配置
+## Configuration
 
-### 基础配置
+### Basic Configuration
 
-编辑 `config.yml` 进行基础设置：
+Edit `config.yml` for basic settings:
 
 ```yaml
 settings:
-  default-menu: "menu.yml"  # 默认菜单
-  debug: false              # 调试模式
+  default-menu: "menu.yml"  # Default menu
+  debug: false              # Debug mode
 ```
 
-### 创建菜单
+### Creating Menus
 
-在 `menus` 文件夹中创建新的 YAML 文件：
+Create a new YAML file in the `menus` folder:
 
 ```yaml
 menu:
-  title: "我的菜单"
-  subtitle: "选择一个选项"
-  content: "这是菜单内容"
+  title: "My Menu"
+  subtitle: "Select an option"
+  content: "This is menu content"
   items:
-    - text: "传送菜单"
-      description: "打开传送菜单"
+    - text: "Teleport Menu"
+      description: "Open teleport menu"
       icon: "compass"
-      icon_type: "java"     # 使用 Java 版物品 ID
+      icon_type: "java"     # Use Java Edition item ID
       submenu: "teleport.yml"
     
-    - text: "执行命令"
-      description: "点击执行命令"
+    - text: "Execute Command"
+      description: "Click to execute command"
       icon: "textures/items/diamond"
-      icon_type: "bedrock"  # 使用基岭版材质路径
-      command: "say 你好"
+      icon_type: "bedrock"  # Use Bedrock Edition texture path
+      command: "say Hello"
 ```
 
-::: tip 提示
-- 每个按钮必须有 text 和 icon
-- command 或 submenu 二选一
-- description 是可选的
-- 图标必须指定类型 (java 或 bedrock)
+::: tip Note
+- Each button must have text and icon
+- Choose either command or submenu
+- description is optional
+- Icon type must be specified (java or bedrock)
 :::
 
-## 使用方法
+## Usage
 
-1. 基岩版玩家输入 `/gmenu` 打开默认菜单
+1. Bedrock Edition players can use `/gmenu` to open the default menu
 
-2. 使用 `/gmenu help` 查看所有可用命令
+2. Use `/gmenu help` to view all available commands
 
-3. 管理员可以使用 `/gmenu reload` 重载配置
+3. Administrators can use `/gmenu reload` to reload configuration

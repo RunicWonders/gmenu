@@ -1,43 +1,43 @@
-# GeyserMenu v1.1.8
+# GeyserMenu v1.3.0-beta1
 
-一个轻量化且简单的基岩版自定义表单插件。
+A lightweight and simple custom form plugin for Bedrock Edition.
 
-## 特性
+## Features
 
-- 🎮 专为基岩版玩家设计的菜单系统
-- 📝 完全可自定义的菜单配置
-- 🔒 内置安全检查机制
-- 🚀 高性能且轻量化
-- 💡 支持 PlaceholderAPI 变量
-- 📊 集成 BStats 统计功能（可配置）
-- 🎨 支持两种图标类型：
-  - Java 版物品 ID（自动映射到基岭版）
-  - 基岭版材质路径（直接使用）
+- Designed specifically for Bedrock Edition players
+- Fully customizable menu configurations
+- Built-in security check mechanism
+- High performance and lightweight
+- PlaceholderAPI variable support
+- Integrated BStats statistics (configurable)
+- Two icon types supported:
+  - Java Edition item IDs (automatically mapped to Bedrock Edition)
+  - Bedrock Edition texture paths (direct use)
 
-## 系统要求
+## Requirements
 
-- Java 21 或更高版本
-- Spigot/Paper 1.21.1 或更高版本
-- [Geyser-Spigot](https://geysermc.org/) 和 [Floodgate](https://wiki.geysermc.org/floodgate/)
+- Java 21 or higher
+- Paper 1.21.4 or higher
+- [Geyser-Spigot](https://geysermc.org/) and [Floodgate](https://wiki.geysermc.org/floodgate/)
 
-## 快速开始
+## Quick Start
 
-1. 下载最新版本的 GeyserMenu
-2. 将插件放入服务器的 plugins 文件夹
-3. 启动服务器，插件将自动生成配置文件
-4. 编辑 `plugins/GeyserMenu/config.yml` 进行基础配置
-5. 在 `plugins/GeyserMenu/menus/` 中编辑或添加菜单
+1. Download the latest version of GeyserMenu
+2. Place the plugin in your server's plugins folder
+3. Start the server, the plugin will automatically generate configuration files
+4. Edit `plugins/GeyserMenu/config.yml` for basic configuration
+5. Edit or add menus in `plugins/GeyserMenu/menus/`
 
-## 基础命令
+## Basic Commands
 
-- `/gmenu` - 打开默认菜单
-- `/gmenu help` - 显示帮助信息
-- `/gmenu reload` - 重载配置文件
-- `/gmenu open <玩家> <菜单>` - 为指定玩家打开菜单
+- `/gmenu` - Open default menu
+- `/gmenu help` - Show help information
+- `/gmenu reload` - Reload configuration files
+- `/gmenu open <player> <menu>` - Open menu for specified player
 
-## 权限节点
+## Permissions
 
-- `geysermenu.use` - 允许使用菜单命令
-- `geysermenu.reload` - 允许重载插件配置
-- `geysermenu.open` - 允许为其他玩家打开菜单
-- `geysermenu.*` - 允许使用所有功能
+- `geysermenu.use` - Allow using menu commands
+- `geysermenu.reload` - Allow reloading plugin configuration
+- `geysermenu.open` - Allow opening menus for other players
+- `geysermenu.*` - Allow all features

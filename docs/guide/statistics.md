@@ -1,87 +1,87 @@
-# 统计功能
+# Statistics
 
-## BStats 统计
+## BStats Statistics
 
-GeyserMenu 集成了 BStats 统计功能，用于收集匿名的插件使用数据，帮助开发者了解插件使用情况并改进插件质量。
+GeyserMenu integrates BStats statistics functionality to collect anonymous plugin usage data, helping developers understand usage patterns and improve plugin quality.
 
-### 配置选项
+### Configuration Options
 
-在 `config.yml` 中，您可以找到以下统计相关配置：
+In `config.yml`, you can find the following statistics-related configuration:
 
 ```yaml
 settings:
   statistics:
-    # 是否启用 BStats 统计 - 帮助开发者了解插件使用情况
+    # Enable BStats statistics - helps developers understand plugin usage
     enable-bstats: true
     
-    # 是否收集自定义统计数据
+    # Collect custom statistics data
     collect-custom-data: true
 ```
 
-### 配置说明
+### Configuration Description
 
-- `enable-bstats`: 控制是否启用 BStats 统计功能
-  - `true`: 启用统计（默认）
-  - `false`: 禁用统计
+- `enable-bstats`: Controls whether BStats statistics functionality is enabled
+  - `true`: Enable statistics (default)
+  - `false`: Disable statistics
 
-- `collect-custom-data`: 控制是否收集自定义统计数据
-  - `true`: 收集详细的插件使用统计（默认）
-  - `false`: 仅收集基础统计
+- `collect-custom-data`: Controls whether custom statistics data is collected
+  - `true`: Collect detailed plugin usage statistics (default)
+  - `false`: Collect only basic statistics
 
-## 收集的数据
+## Data Collected
 
-### 基础统计
-- 服务器版本分布
-- Java 版本分布
-- 在线玩家数量
-- 服务器软件类型（Paper、Spigot、Bukkit 等）
+### Basic Statistics
+- Server version distribution
+- Java version distribution
+- Online player count
+- Server software type (Paper, Spigot, Bukkit, etc.)
 
-### 插件特定统计
-- 配置的菜单数量
-- 启用的功能（PAPI缓存、命令安全检查、更新检查等）
-- 菜单类型使用情况（主菜单、传送菜单、商店菜单）
-- 性能配置设置
-- PlaceholderAPI 使用情况
+### Plugin-Specific Statistics
+- Number of configured menus
+- Enabled features (PAPI caching, command security check, update check, etc.)
+- Menu type usage (main menu, teleport menu, shop menu)
+- Performance configuration settings
+- PlaceholderAPI usage
 
-## 隐私说明
+## Privacy Information
 
-### 收集的信息
-- **匿名数据**: 所有统计数据都是匿名的，不包含任何可识别服务器或玩家的信息
-- **服务器信息**: 服务器版本、Java版本、插件版本等技术信息
-- **使用统计**: 功能使用情况、配置选项等
+### Information Collected
+- **Anonymous Data**: All statistics data is anonymous and does not contain any information that can identify servers or players
+- **Server Information**: Technical information such as server version, Java version, plugin version
+- **Usage Statistics**: Feature usage, configuration options, etc.
 
-### 不收集的信息
-- 服务器IP地址或域名
-- 玩家用户名或UUID
-- 聊天内容或命令内容
-- 服务器配置的敏感信息
+### Information Not Collected
+- Server IP address or domain
+- Player usernames or UUIDs
+- Chat content or command content
+- Sensitive server configuration information
 
-## 如何禁用
+## How to Disable
 
-如果您不希望发送统计数据，可以通过以下方式禁用：
+If you do not wish to send statistics data, you can disable it through the following methods:
 
-### 方法1：插件配置
-在 `config.yml` 中设置：
+### Method 1: Plugin Configuration
+In `config.yml`, set:
 ```yaml
 settings:
   statistics:
     enable-bstats: false
 ```
 
-### 方法2：全局禁用
-在服务器的 `plugins/bStats/config.yml` 中设置：
+### Method 2: Global Disable
+In the server's `plugins/bStats/config.yml`, set:
 ```yaml
 enabled: false
 ```
 
-## 查看统计数据
+## View Statistics
 
-您可以在 [bStats 官网](https://bstats.org/plugin/bukkit/GeyserMenu/26736) 查看 GeyserMenu 的公开统计数据。
+You can view GeyserMenu's public statistics data at [bStats Official Website](https://bstats.org/plugin/bukkit/GeyserMenu/26736).
 
-::: tip 提示
-保持统计功能启用有助于开发者了解插件的使用情况，从而更好地改进插件。所有数据都是匿名的，不会收集任何敏感信息。
+::: tip Note
+Keeping statistics enabled helps developers understand plugin usage, thereby better improving the plugin. All data is anonymous and no sensitive information is collected.
 :::
 
-::: warning 注意
-如果您的服务器有特殊的隐私要求，可以随时在配置中禁用统计功能。
+::: warning Note
+If your server has special privacy requirements, you can disable statistics functionality in the configuration at any time.
 :::

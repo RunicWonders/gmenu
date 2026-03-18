@@ -1,253 +1,253 @@
-# 配置详解
+# Configuration Guide
 
-## 主配置文件
+## Main Configuration File
 
-`config.yml` 包含插件的核心设置：
+`config.yml` contains the core settings of the plugin:
 
-### 性能设置
+### Performance Settings
 
 ```yaml
 performance:
-  # 命令执行延迟（毫秒）
+  # Command execution delay (milliseconds)
   command-delay: 0
   
-  # PAPI变量缓存
+  # PAPI variable caching
   cache-placeholders: false
   cache-refresh: 30
   max-cache-size: 1000
 ```
 
-### 统计设置
+### Statistics Settings
 
 ```yaml
 statistics:
-  # 是否启用 BStats 统计
+  # Enable BStats statistics
   enable-bstats: true
   
-  # 是否收集自定义统计数据
+  # Collect custom statistics data
   collect-custom-data: true
 ```
 
-::: tip 提示
-关于统计功能的详细说明，请参阅 [统计功能](./statistics.md) 文档。
+::: tip Note
+For detailed information about statistics, please refer to the [Statistics](./statistics.md) documentation.
 :::
 
-### 安全设置
+### Security Settings
 
 ```yaml
 security:
-  # 禁止执行的命令
+  # Blocked commands
   blocked-commands:
     - "op"
     - "deop"
   
-  # 特殊字符检查
+  # Special character check
   allow-special-chars: false
   
-  # 文件路径安全检查
+  # File path security check
   check-file-path: true
 ```
 
-### 图标设置
+### Icon Settings
 
-GeyserMenu 支持两种类型的图标：
+GeyserMenu supports two types of icons:
 
-### 1. Java 版物品 ID
-使用 Java 版的物品 ID，会自动转换为对应的基岩版材质路径：
-
-```yaml
-items:
-  - text: "传送菜单"
-    icon: "compass"      # Java版物品ID
-    icon_type: "java"    # 指定使用Java版图标
-```
-
-### 2. 基岩版材质路径
-直接使用基岩版的材质路径：
+### 1. Java Edition Item ID
+Use Java Edition item IDs, which will be automatically converted to corresponding Bedrock Edition texture paths:
 
 ```yaml
 items:
-  - text: "商店菜单"
-    icon: "textures/items/diamond"    # 基岩版材质路径
-    icon_type: "bedrock"             # 指定使用基岭版图标
+  - text: "Teleport Menu"
+    icon: "compass"      # Java Edition item ID
+    icon_type: "java"    # Specify using Java Edition icon
 ```
 
-::: warning 重要提示
-从版本 1.1.0 开始，必须通过 `icon_type` 属性明确指定图标类型（"java" 或 "bedrock"）。这是为了避免图标显示错误和提高性能。
+### 2. Bedrock Edition Texture Path
+Directly use Bedrock Edition texture paths:
+
+```yaml
+items:
+  - text: "Shop Menu"
+    icon: "textures/items/diamond"    # Bedrock Edition texture path
+    icon_type: "bedrock"             # Specify using Bedrock Edition icon
+```
+
+::: warning Important
+Starting from version 1.1.0, you must explicitly specify the icon type ("java" or "bedrock") through the `icon_type` attribute. This is to avoid icon display errors and improve performance.
 :::
 
-### 图标映射配置
+### Icon Mapping Configuration
 
-在 config.yml 中配置 Java 版到基岭版的材质映射：
+Configure Java Edition to Bedrock Edition texture mappings in config.yml:
 
 ```yaml
 icons:
-  # 默认图标
+  # Default icon
   default: "textures/items/paper"
   
-  # 图标类型映射 (Java版 -> 基岭版)
+  # Icon type mapping (Java Edition -> Bedrock Edition)
   mappings:
-    # 方块
+    # Blocks
     grass_block: "textures/blocks/grass_side"
     stone: "textures/blocks/stone"
     dirt: "textures/blocks/dirt"
     
-    # 物品
+    # Items
     diamond: "textures/items/diamond"
     compass: "textures/items/compass_item"
     book: "textures/items/book_normal"
 ```
 
-### 使用建议
+### Usage Recommendations
 
-1. 如果你熟悉 Java 版物品 ID，使用 `icon_type: "java"`
-2. 如果你需要使用特定的基岭版材质，使用 `icon_type: "bedrock"`
-3. 如果没有指定 `icon_type`，默认会尝试作为 Java 版物品 ID 处理
+1. If you are familiar with Java Edition item IDs, use `icon_type: "java"`
+2. If you need to use specific Bedrock Edition textures, use `icon_type: "bedrock"`
+3. If `icon_type` is not specified, it will default to Java Edition item ID
 
-::: tip 提示
-- Java 版物品 ID 不需要包含 `minecraft:` 前缀
-- 基岭版材质路径必须是完整的材质路径
-- 可以在配置文件中添加新的材质映射
-- 图标类型必须通过 icon_type 指定 ("java" 或 "bedrock")
+::: tip Note
+- Java Edition item IDs do not need the `minecraft:` prefix
+- Bedrock Edition texture paths must be complete texture paths
+- You can add new texture mappings in the configuration file
+- Icon type must be specified via icon_type ("java" or "bedrock")
 :::
 
-::: warning 注意
-如果 Java 版物品 ID 没有对应的映射，将使用默认图标
+::: warning Note
+If a Java Edition item ID has no corresponding mapping, the default icon will be used
 :::
 
-## 消息配置
+## Message Configuration
 
-`messages.yml` 用于配置插件的所有文本消息：
+`messages.yml` is used to configure all text messages of the plugin:
 
 ```yaml
-prefix: "§6[GeyserMenu] §f"  # 消息前缀
+prefix: "§6[GeyserMenu] §f"  # Message prefix
 
 reload:
-  success: "§a配置重载成功!"  # 重载成功提示
-  start: "§e正在重载插件配置..."  # 开始重载提示
+  success: "§aConfiguration reloaded successfully!"  # Reload success message
+  start: "§eReloading plugin configuration..."  # Start reload message
 
 error:
-  no-permission: "§c你没有权限执行此命令!"  # 权限不足提示
-  # ... 其他错误消息
+  no-permission: "§cYou don't have permission to execute this command!"  # No permission message
+  # ... other error messages
 ```
 
-## 菜单配置
+## Menu Configuration
 
-菜单文件结构说明：
+Menu file structure explanation:
 
-### 基础结构
+### Basic Structure
 
 ```yaml
 menu:
-  # 菜单标题
-  title: "主菜单"
+  # Menu title
+  title: "Main Menu"
   
-  # 副标题（可选）
-  subtitle: "选择一个选项"
+  # Subtitle (optional)
+  subtitle: "Select an option"
   
-  # 主要内容（可选）
-  content: "这是菜单内容"
+  # Main content (optional)
+  content: "This is menu content"
   
-  # 页脚（可选）
-  footer: "在线人数: %server_online%"
+  # Footer (optional)
+  footer: "Online players: %server_online%"
   
-  # 按钮列表
+  # Button list
   items:
-    - text: "传送菜单"
-      description: "打开传送菜单"
+    - text: "Teleport Menu"
+      description: "Open teleport menu"
       icon: "compass"
-      icon_type: "java"      # 必须指定图标类型
+      icon_type: "java"      # Must specify icon type
       submenu: "teleport.yml"
     
-    - text: "商店菜单"
-      description: "打开商店菜单"
+    - text: "Shop Menu"
+      description: "Open shop menu"
       icon: "textures/items/diamond"
-      icon_type: "bedrock"   # 必须指定图标类型
+      icon_type: "bedrock"   # Must specify icon type
       submenu: "shop.yml"
     
-    - text: "返回出生点"
-      description: "点击传送到出生点"
+    - text: "Return to Spawn"
+      description: "Click to teleport to spawn"
       icon: "nether_star"
-      icon_type: "java"    # 添加图标类型
+      icon_type: "java"    # Add icon type
       command: "spawn"
 ```
 
-::: tip 提示
-- 所有文本支持颜色代码 (使用 & 符号)
-- 支持 PlaceholderAPI 变量
-- 图标类型必须通过 icon_type 指定 ("java" 或 "bedrock")
+::: tip Note
+- All text supports color codes (using & symbol)
+- Supports PlaceholderAPI variables
+- Icon type must be specified via icon_type ("java" or "bedrock")
 :::
 
-### 菜单类型
+### Menu Types
 
-GeyserMenu 支持多种菜单类型，通过不同的配置实现：
+GeyserMenu supports multiple menu types through different configurations:
 
-#### 1. 子菜单类型
+#### 1. Submenu Type
 
-通过 `submenu` 属性打开另一个菜单文件：
+Open another menu file through the `submenu` attribute:
 
 ```yaml
 items:
-  - text: "传送菜单"
-    description: "打开传送菜单"
+  - text: "Teleport Menu"
+    description: "Open teleport menu"
     icon: "compass"
     icon_type: "java"
-    submenu: "teleport.yml"  # 点击后打开teleport.yml菜单
+    submenu: "teleport.yml"  # Opens teleport.yml menu on click
 ```
 
-#### 2. 命令执行类型
+#### 2. Command Execution Type
 
-通过 `command` 属性执行指定命令：
+Execute a specified command through the `command` attribute:
 
 ```yaml
 items:
-  - text: "返回出生点"
-    description: "点击传送到出生点"
+  - text: "Return to Spawn"
+    description: "Click to teleport to spawn"
     icon: "nether_star"
     icon_type: "java"
-    command: "spawn"  # 点击后执行spawn命令
+    command: "spawn"  # Executes spawn command on click
 ```
 
-#### 3. 命令执行方式
+#### 3. Command Execution Mode
 
-通过 `execute_as` 属性指定命令的执行方式：
+Specify the command execution mode through the `execute_as` attribute:
 
 ```yaml
 items:
-  - text: "获取钻石"
-    description: "获得一个钻石"
+  - text: "Get Diamond"
+    description: "Receive a diamond"
     icon: "diamond"
     icon_type: "java"
     command: "give {player} diamond 1"
-    execute_as: "console"  # 以控制台身份执行命令
+    execute_as: "console"  # Execute command as console
 ```
 
-可用的执行方式：
-- `player`: 以玩家身份执行命令（默认）
-- `console`: 以控制台身份执行命令
-- `op`: 临时给予玩家OP权限执行命令
+Available execution modes:
+- `player`: Execute command as player (default)
+- `console`: Execute command as console
+- `op`: Temporarily grant player OP permission to execute command
 
-::: warning 安全提示
-使用 `console` 或 `op` 执行方式时要特别小心，确保命令不会被滥用。建议在 config.yml 中配置 `blocked-commands` 列表，禁止执行危险命令。
+::: warning Security Note
+Be extra careful when using `console` or `op` execution modes to ensure commands are not abused. It is recommended to configure the `blocked-commands` list in config.yml to block dangerous commands.
 :::
 
-## 配置保存
+## Configuration Saving
 
-配置文件的保存和重载机制：
+Configuration file saving and reloading mechanism:
 
-1. 首次启动时会生成所有默认配置文件
-2. 之后修改配置文件不会被覆盖
-3. 使用 `/gmenu reload` 重载时会保留修改
+1. All default configuration files are generated on first startup
+2. Subsequent modifications to configuration files will not be overwritten
+3. Modifications are preserved when using `/gmenu reload` to reload
 
-::: warning 注意
-不要在服务器运行时直接删除配置文件，这可能导致插件无法正常工作。
+::: warning Note
+Do not delete configuration files while the server is running, as this may cause the plugin to malfunction.
 ::: 
 
-## 目录说明
+## Directory Description
 
-### 菜单目录
+### Menu Directory
 
-`menus` 目录用于存放菜单配置文件：
-- 使用 YAML 格式
-- 文件名即为菜单名
-- 支持子目录组织菜单
+The `menus` directory is used to store menu configuration files:
+- Uses YAML format
+- The filename is the menu name
+- Supports subdirectory organization for menus
