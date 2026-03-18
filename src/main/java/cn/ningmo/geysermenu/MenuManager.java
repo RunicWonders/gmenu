@@ -316,10 +316,10 @@ public class MenuManager {
                     }
                     
                     case "slider" -> {
-                        float min = getFloat(component, "min", 0);
-                        float max = getFloat(component, "max", 100);
-                        float step = getFloat(component, "step", 1);
-                        float defaultVal = getFloat(component, "default", min);
+                        int min = getInt(component, "min", 0);
+                        int max = getInt(component, "max", 100);
+                        int step = getInt(component, "step", 1);
+                        int defaultVal = getInt(component, "default", min);
                         form.slider(text, min, max, step, defaultVal);
                     }
                     
