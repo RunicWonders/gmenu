@@ -3,17 +3,20 @@ package cn.ningmo.geysermenu;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import org.bukkit.Bukkit;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import org.json.JSONObject;
 
 public class GeyserMenu extends JavaPlugin {
     private static GeyserMenu instance;
     private MenuManager menuManager;
     private YamlConfiguration messages;
+    private YamlConfiguration defaultMessages;
     private BStatsManager bStatsManager;
     private PermissionManager permissionManager;
     
@@ -26,11 +29,14 @@ public class GeyserMenu extends JavaPlugin {
     public void onEnable() {
         try {
             // 首先保存资源，因为 reloadMessages 需要它们
-            saveResource("messages.yml", false);
-            saveResource("messages_en.yml", false);
+            saveResourceSafely("messages.yml");
+            saveResourceSafely("messages_en.yml");
             
             // 立即加载消息，以便后续可以使用 getLogMessage
             reloadMessages();
+            
+            // 自动迁移/补充缺失的消息配置
+            migrateMessages();
             
             // 防止重复初始化
             if (instance != null) {
@@ -56,11 +62,11 @@ public class GeyserMenu extends JavaPlugin {
             // 重新加载配置以应用迁移后的更改
             super.reloadConfig();
             
-            saveResource("menus/menu.yml", false);
-            saveResource("menus/shop.yml", false);
-            saveResource("menus/teleport.yml", false);
-            saveResource("menus/confirm.yml", false);
-            saveResource("menus/settings.yml", false);
+            saveResourceSafely("menus/menu.yml");
+            saveResourceSafely("menus/shop.yml");
+            saveResourceSafely("menus/teleport.yml");
+            saveResourceSafely("menus/confirm.yml");
+            saveResourceSafely("menus/settings.yml");
             
             createDirectories();
             
@@ -139,13 +145,19 @@ public class GeyserMenu extends JavaPlugin {
                 resourceFileName = "messages_en.yml";
             }
             
+            // 加载默认配置作为回退
+            InputStream resourceStream = getResource(resourceFileName);
+            if (resourceStream != null) {
+                defaultMessages = YamlConfiguration.loadConfiguration(new InputStreamReader(resourceStream, StandardCharsets.UTF_8));
+            }
+            
             File messagesFile = new File(getDataFolder(), messagesFileName);
             if (!messagesFile.exists()) {
-                saveResource(resourceFileName, false);
+                saveResourceSafely(resourceFileName);
                 if (!messagesFile.exists() && !messagesFileName.equals("messages.yml")) {
                     messagesFile = new File(getDataFolder(), "messages.yml");
                     if (!messagesFile.exists()) {
-                        saveResource("messages.yml", false);
+                        saveResourceSafely("messages.yml");
                     }
                 }
             }
@@ -156,12 +168,51 @@ public class GeyserMenu extends JavaPlugin {
         }
     }
     
+    private void saveResourceSafely(String resourcePath) {
+        File file = new File(getDataFolder(), resourcePath);
+        if (!file.exists()) {
+            try {
+                saveResource(resourcePath, false);
+            } catch (Exception e) {
+                getLogger().warning("保存资源文件失败: " + resourcePath + ", 错误: " + e.getMessage());
+            }
+        }
+    }
+    
+    public void migrateMessages() {
+        if (messages == null || defaultMessages == null) return;
+        
+        boolean changed = false;
+        for (String key : defaultMessages.getKeys(true)) {
+            if (!messages.contains(key)) {
+                messages.set(key, defaultMessages.get(key));
+                changed = true;
+            }
+        }
+        
+        if (changed) {
+            try {
+                String language = getConfig().getString("settings.language", "zh_cn");
+                String messagesFileName = "en".equalsIgnoreCase(language) ? "messages_en.yml" : "messages.yml";
+                File messagesFile = new File(getDataFolder(), messagesFileName);
+                messages.save(messagesFile);
+                getLogger().info("已自动迁移并补充缺失的消息配置。");
+            } catch (Exception e) {
+                getLogger().warning("保存迁移后的消息配置失败: " + e.getMessage());
+            }
+        }
+    }
+    
     public String getMessage(String path, String... args) {
-        if (messages == null) {
+        if (messages == null && defaultMessages == null) {
             return "§6[GeyserMenu] §f" + path;
         }
         try {
-            String message = messages.getString(path);
+            String message = messages != null ? messages.getString(path) : null;
+            if (message == null && defaultMessages != null) {
+                message = defaultMessages.getString(path);
+            }
+            
             if (message == null) {
                 getLogger().warning("找不到消息配置: " + path);
                 return getPrefix() + "§c消息未配置: " + path;
@@ -183,11 +234,15 @@ public class GeyserMenu extends JavaPlugin {
     }
     
     public String getRawMessage(String path) {
-        if (messages == null) {
+        if (messages == null && defaultMessages == null) {
             return path;
         }
         try {
-            return messages.getString(path, path);
+            String message = messages != null ? messages.getString(path) : null;
+            if (message == null && defaultMessages != null) {
+                message = defaultMessages.getString(path);
+            }
+            return message != null ? message : path;
         } catch (Exception e) {
             getLogger().warning("获取原始消息时发生错误: " + path + ", 错误: " + e.getMessage());
             return path;
@@ -195,11 +250,15 @@ public class GeyserMenu extends JavaPlugin {
     }
     
     public String getLogMessage(String path, String... args) {
-        if (messages == null) {
+        if (messages == null && defaultMessages == null) {
             return "消息系统未就绪: " + path;
         }
         try {
-            String message = messages.getString(path);
+            String message = messages != null ? messages.getString(path) : null;
+            if (message == null && defaultMessages != null) {
+                message = defaultMessages.getString(path);
+            }
+            
             if (message == null) {
                 getLogger().warning("找不到消息配置: " + path);
                 return "消息未配置: " + path;
@@ -271,11 +330,15 @@ public class GeyserMenu extends JavaPlugin {
     }
     
     public String getPrefix() {
-        if (messages == null) {
+        if (messages == null && defaultMessages == null) {
             return "§6[GeyserMenu] §f";
         }
         try {
-            return messages.getString("prefix", "§6[GeyserMenu] §f");
+            String prefix = messages != null ? messages.getString("prefix") : null;
+            if (prefix == null && defaultMessages != null) {
+                prefix = defaultMessages.getString("prefix");
+            }
+            return prefix != null ? prefix : "§6[GeyserMenu] §f";
         } catch (Exception e) {
             getLogger().warning("获取前缀时出错: " + e.getMessage());
             return "§6[GeyserMenu] §f";
