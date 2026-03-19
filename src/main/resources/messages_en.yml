@@ -1,0 +1,149 @@
+# GeyserMenu Messages Configuration (English)
+
+prefix: "§6[GeyserMenu] §f"
+
+reload:
+  success: "§aConfiguration reloaded successfully!"
+  start: "§eReloading plugin configuration..."
+
+error:
+  no-permission: "§cYou don't have permission to execute this command!"
+  player-only: "§cThis command can only be executed by a player!"
+  bedrock-only: "§cThis feature is only available for Bedrock players!"
+  menu-not-found: "§cMenu not found!"
+  menu-format-error: "§cMenu format error!"
+  player-not-found: "§cPlayer not found: {0}"
+  command-error: "§cAn error occurred while executing the command, please contact the administrator!"
+  form-error: "§cAn error occurred while opening the menu, please contact the administrator!"
+  placeholder-error: "§cAn error occurred while processing placeholders!"
+  unknown-command: "§cUnknown command, use /gmenu help for help"
+  no-menu-permission: "§cYou don't have permission to use this menu!"
+  command-blocked: "§cThis command has been disabled!"
+  form-cooldown: "§cPlease don't open the menu too quickly!"
+
+command:
+  usage: "§cUsage: {0}"
+  help:
+    header: "§6========== GeyserMenu Help =========="
+    footer: "§6=================================="
+    menu: "§f/gmenu §7- Open the default menu"
+    help: "§f/gmenu help §7- Show this help message"
+    reload: "§f/gmenu reload §7- Reload plugin configuration"
+    open: "§f/gmenu open <player> <menu> §7- Open menu for specified player"
+  
+  open:
+    success: "§aMenu opened for player {0}!"
+    usage: "/gmenu open <player> <menu>"
+
+update:
+  console:
+    checking: "Checking for updates..."
+    found: "§eNew version found: v{0}"
+    download: "§6Download URL: {0}"
+    failed: "§cFailed to check for updates: {0}"
+    up-to-date: "§aPlugin is up to date"
+  
+  player:
+    available: "§eNew version v{0} is available"
+    current: "§7Current version: v{1}"
+    download: "§6Download URL: §f{0}"
+    click-to-download: "§aClick to open download page"
+
+statistics:
+  console:
+    enabled: "BStats statistics enabled"
+    disabled: "BStats statistics disabled"
+    init-error: "Error initializing BStats statistics: {0}"
+    shutdown: "BStats statistics shutdown"
+    shutdown-error: "Error shutting down BStats statistics: {0}"
+  
+  labels:
+    papi-cache: "PAPI Cache"
+    command-security: "Command Security"
+    update-check: "Update Check"
+    debug-mode: "Debug Mode"
+    placeholderapi: "PlaceholderAPI"
+    main-menu: "Main Menu"
+    teleport-menu: "Teleport Menu"
+    shop-menu: "Shop Menu"
+    high-performance: "High Performance"
+    medium-performance: "Medium Performance"
+    default-performance: "Default Performance"
+
+plugin:
+  load:
+    success: "GeyserMenu v{0} loaded successfully!"
+    error: "Error loading plugin: {0}"
+    duplicate: "Duplicate plugin load detected!"
+  disable:
+    success: "GeyserMenu unloaded!"
+    error: "Error unloading plugin: {0}"
+  dependency:
+    missing: "Missing required dependencies, plugin will be disabled!"
+    error: "Error checking dependencies: {0}"
+  command:
+    register-failed: "Failed to register command!"
+
+config:
+  load-error: "Error loading messages configuration: {0}"
+  missing-settings: "Configuration file missing required settings"
+  missing-messages: "Messages configuration file not found"
+  check-error: "Error checking configuration file: {0}"
+
+menu:
+  load:
+    success: "Loaded menu: {0}"
+    error: "Error loading menu: {0}"
+    missing-file: "Menu file not found: {0}"
+    missing-config: "Menu {0} missing file configuration"
+    unsafe-filename: "Unsafe menu filename detected: {0}"
+    read-error: "Error reading menu {0} parameters, did you miss any values?"
+  open:
+    error: "Error opening menu: {0}"
+    invalid-params: "Invalid parameters: player={0}, menuName={1}"
+    floodgate-unavailable: "Floodgate API unavailable!"
+    player-instance-error: "Failed to get Floodgate instance for player {0}"
+    cooldown: "Player {0} opening menu too fast, request ignored"
+
+form:
+  response-error: "Error processing form response: {0}"
+  modal-response-error: "Error processing modal form response: {0}"
+  custom-response-error: "Error processing custom form response: {0}"
+
+command-exec:
+  execute-error: "Error executing command: {0}"
+  unsafe-detected: "Unsafe command detected: {0}"
+  tab-complete-error: "Error in tab completion: {0}"
+
+placeholder:
+  process-error: "Error processing placeholder: {0}"
+  cache-error: "Error processing cached placeholder: {0}"
+
+icon:
+  process-error: "Error processing icon: {0}"
+
+instance:
+  plugin-not-init: "Plugin instance not initialized!"
+  manager-not-init: "{0} not initialized!"
+
+message:
+  not-found: "Message configuration not found: {0}"
+  not-configured: "§cMessage not configured: {0}"
+  process-error: "§cMessage processing error: {0}"
+  raw-error: "Error getting raw message: {0}"
+  prefix-error: "Error getting prefix"
+
+migration:
+  start: "Old configuration file detected (v{0}), starting migration..."
+  backup-success: "Old configuration backed up to: {0}"
+  backup-failed: "Failed to backup configuration file: {0}"
+  complete: "Configuration migration complete! (v{0} -> v{1})"
+  error: "Error migrating configuration file: {0}"
+
+permission:
+  use: "Allow using menu commands"
+  reload: "Allow reloading plugin configuration"
+  open: "Allow opening menus for other players"
+  admin: "Administrator permission"
+  menu-all: "Allow using all menus"
+  menu-template: "Allow using {0} menu"

@@ -52,10 +52,100 @@ update:
     click-to-download: "§a点击打开下载页面"
 
 statistics:
-  # BStats 统计相关消息
   console:
     enabled: "BStats 统计已启用"
     disabled: "BStats 统计已禁用"
     init-error: "初始化 BStats 统计时发生错误: {0}"
     shutdown: "BStats 统计已关闭"
     shutdown-error: "关闭 BStats 统计时发生错误: {0}"
+  
+  labels:
+    papi-cache: "PAPI缓存"
+    command-security: "命令安全检查"
+    update-check: "更新检查"
+    debug-mode: "调试模式"
+    placeholderapi: "PlaceholderAPI"
+    main-menu: "主菜单"
+    teleport-menu: "传送菜单"
+    shop-menu: "商店菜单"
+    high-performance: "高性能配置"
+    medium-performance: "中等性能配置"
+    default-performance: "默认配置"
+
+plugin:
+  load:
+    success: "GeyserMenu v{0} 已成功加载!"
+    error: "插件加载时发生错误: {0}"
+    duplicate: "检测到插件重复加载!"
+  disable:
+    success: "GeyserMenu 已卸载!"
+    error: "插件卸载时发生错误: {0}"
+  dependency:
+    missing: "缺少必要的前置插件，插件将被禁用!"
+    error: "检查依赖时发生错误: {0}"
+  command:
+    register-failed: "命令注册失败!"
+
+config:
+  load-error: "加载消息配置时发生错误: {0}"
+  missing-settings: "配置文件缺少必要设置"
+  missing-messages: "消息配置文件不存在"
+  check-error: "检查配置文件时发生错误: {0}"
+
+menu:
+  load:
+    success: "已加载菜单: {0}"
+    error: "加载菜单时发生错误: {0}"
+    missing-file: "菜单文件不存在: {0}"
+    missing-config: "菜单 {0} 缺少file配置"
+    unsafe-filename: "检测到不安全的菜单文件名: {0}"
+    read-error: "读取菜单 {0} 的参数时出现问题, 你是否有值未输入?"
+  open:
+    error: "打开菜单时出错: {0}"
+    invalid-params: "无效的参数: player={0}, menuName={1}"
+    floodgate-unavailable: "Floodgate API 不可用!"
+    player-instance-error: "无法获取玩家 {0} 的Floodgate实例"
+    cooldown: "玩家 {0} 打开菜单过快,请求被忽略"
+
+form:
+  response-error: "处理表单响应时出错: {0}"
+  modal-response-error: "处理模态表单响应时出错: {0}"
+  custom-response-error: "处理自定义表单响应时出错: {0}"
+
+command-exec:
+  execute-error: "执行命令时出错: {0}"
+  unsafe-detected: "检测到不安全的命令: {0}"
+  tab-complete-error: "Tab补全时发生错误: {0}"
+
+placeholder:
+  process-error: "处理变量时出错: {0}"
+  cache-error: "处理缓存变量时出错: {0}"
+
+icon:
+  process-error: "处理图标时出错: {0}"
+
+instance:
+  plugin-not-init: "插件实例未初始化!"
+  manager-not-init: "{0}未初始化!"
+
+message:
+  not-found: "找不到消息配置: {0}"
+  not-configured: "§c消息未配置: {0}"
+  process-error: "§c消息处理错误: {0}"
+  raw-error: "获取原始消息时出错: {0}"
+  prefix-error: "获取前缀时出错"
+
+migration:
+  start: "检测到旧版配置文件 (v{0})，开始迁移..."
+  backup-success: "已备份旧配置文件到: {0}"
+  backup-failed: "备份配置文件失败: {0}"
+  complete: "配置文件迁移完成! (v{0} -> v{1})"
+  error: "迁移配置文件时出错: {0}"
+
+permission:
+  use: "允许使用菜单命令"
+  reload: "允许重载插件配置"
+  open: "允许为其他玩家打开菜单"
+  admin: "管理员权限"
+  menu-all: "允许使用所有菜单"
+  menu-template: "允许使用 {0} 菜单"

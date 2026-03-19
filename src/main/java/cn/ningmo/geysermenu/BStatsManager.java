@@ -102,24 +102,23 @@ public class BStatsManager {
             Map<String, Integer> valueMap = new HashMap<>();
             
             if (plugin.getConfig().getBoolean("settings.performance.cache-placeholders", false)) {
-                valueMap.put("PAPI缓存", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.papi-cache"), 1);
             }
             
             if (plugin.getConfig().getBoolean("settings.enable-command-security", true)) {
-                valueMap.put("命令安全检查", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.command-security"), 1);
             }
             
             if (plugin.getConfig().getBoolean("settings.check-updates", true)) {
-                valueMap.put("更新检查", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.update-check"), 1);
             }
             
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                valueMap.put("调试模式", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.debug-mode"), 1);
             }
             
-            // 检查是否安装了 PlaceholderAPI
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                valueMap.put("PlaceholderAPI", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.placeholderapi"), 1);
             }
             
             return valueMap;
@@ -140,17 +139,16 @@ public class BStatsManager {
         metrics.addCustomChart(new AdvancedPie("menu_types", () -> {
             Map<String, Integer> valueMap = new HashMap<>();
             
-            // 统计启用的菜单类型
             if (plugin.getConfig().getBoolean("menus.main.enable", true)) {
-                valueMap.put("主菜单", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.main-menu"), 1);
             }
             
             if (plugin.getConfig().getBoolean("menus.teleport.enable", true)) {
-                valueMap.put("传送菜单", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.teleport-menu"), 1);
             }
             
             if (plugin.getConfig().getBoolean("menus.shop.enable", true)) {
-                valueMap.put("商店菜单", 1);
+                valueMap.put(plugin.getLogMessage("statistics.labels.shop-menu"), 1);
             }
             
             return valueMap;
@@ -161,9 +159,9 @@ public class BStatsManager {
             int commandDelay = plugin.getConfig().getInt("settings.performance.command-delay", 0);
             boolean cacheEnabled = plugin.getConfig().getBoolean("settings.performance.cache-placeholders", false);
             
-            if (cacheEnabled && commandDelay > 0) return "高性能配置";
-            if (cacheEnabled || commandDelay > 0) return "中等性能配置";
-            return "默认配置";
+            if (cacheEnabled && commandDelay > 0) return plugin.getLogMessage("statistics.labels.high-performance");
+            if (cacheEnabled || commandDelay > 0) return plugin.getLogMessage("statistics.labels.medium-performance");
+            return plugin.getLogMessage("statistics.labels.default-performance");
         }));
     }
     

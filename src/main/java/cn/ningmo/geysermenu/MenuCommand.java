@@ -12,9 +12,11 @@ import java.util.stream.Collectors;
 
 public class MenuCommand implements CommandExecutor, TabCompleter {
     private final GeyserMenu plugin;
+    private final PermissionManager permissionManager;
     
     public MenuCommand(GeyserMenu plugin) {
         this.plugin = plugin;
+        this.permissionManager = plugin.getPermissionManager();
     }
     
     @Override
@@ -22,7 +24,7 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
         if (args.length > 0) {
             switch (args[0].toLowerCase()) {
                 case "reload":
-                    if (!sender.hasPermission("geysermenu.reload")) {
+                    if (!permissionManager.hasReloadPermission(sender)) {
                         sender.sendMessage(plugin.getMessage("error.no-permission"));
                         return true;
                     }
@@ -30,11 +32,12 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
                     plugin.reloadConfig();
                     plugin.reloadMessages();
                     plugin.getMenuManager().loadMenus();
+                    permissionManager.clearAllCache();
                     sender.sendMessage(plugin.getMessage("reload.success"));
                     return true;
                     
                 case "open":
-                    if (!sender.hasPermission("geysermenu.open")) {
+                    if (!permissionManager.hasOpenPermission(sender)) {
                         sender.sendMessage(plugin.getMessage("error.no-permission"));
                         return true;
                     }
@@ -60,7 +63,7 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
         // 如果没有参数或参数不匹配任何子命令
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (!player.hasPermission("geysermenu.use")) {
+            if (!permissionManager.hasUsePermission(player)) {
                 sender.sendMessage(plugin.getMessage("error.no-permission"));
                 return true;
             }
@@ -80,10 +83,10 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(plugin.getRawMessage("command.help.header"));
         sender.sendMessage(plugin.getRawMessage("command.help.menu"));
         sender.sendMessage(plugin.getRawMessage("command.help.help"));
-        if (sender.hasPermission("geysermenu.reload")) {
+        if (permissionManager.hasReloadPermission(sender)) {
             sender.sendMessage(plugin.getRawMessage("command.help.reload"));
         }
-        if (sender.hasPermission("geysermenu.open")) {
+        if (permissionManager.hasOpenPermission(sender)) {
             sender.sendMessage(plugin.getRawMessage("command.help.open"));
         }
         sender.sendMessage(plugin.getRawMessage("command.help.footer"));
@@ -99,10 +102,10 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
                 completions.add("help");
                 
                 // 权限命令
-                if (sender.hasPermission("geysermenu.reload")) {
+                if (permissionManager.hasReloadPermission(sender)) {
                     completions.add("reload");
                 }
-                if (sender.hasPermission("geysermenu.open")) {
+                if (permissionManager.hasOpenPermission(sender)) {
                     completions.add("open");
                 }
                 
@@ -110,20 +113,20 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
                 return completions.stream()
                     .filter(s -> s.toLowerCase().startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("open") && sender.hasPermission("geysermenu.open")) {
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("open") && permissionManager.hasOpenPermission(sender)) {
                 // 补全在线玩家名
                 return Bukkit.getOnlinePlayers().stream()
                     .map(Player::getName)
                     .filter(s -> s.toLowerCase().startsWith(args[1].toLowerCase()))
                     .collect(Collectors.toList());
-            } else if (args.length == 3 && args[0].equalsIgnoreCase("open") && sender.hasPermission("geysermenu.open")) {
+            } else if (args.length == 3 && args[0].equalsIgnoreCase("open") && permissionManager.hasOpenPermission(sender)) {
                 // 补全菜单名
                 return plugin.getMenuManager().getMenuList().stream()
                     .filter(s -> s.toLowerCase().startsWith(args[2].toLowerCase()))
                     .collect(Collectors.toList());
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Tab补全时发生错误: " + e.getMessage());
+            plugin.getLogger().warning(plugin.getLogMessage("command-exec.tab-complete-error", e.getMessage()));
         }
         
         return completions;
