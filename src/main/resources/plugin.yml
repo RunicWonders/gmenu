@@ -1,5 +1,5 @@
 name: GeyserMenu
-version: '1.3.0-beta1'
+version: '1.3.0-beta2'
 main: cn.ningmo.geysermenu.GeyserMenu
 author: 柠枺
 api-version: '1.21'
@@ -23,10 +23,23 @@ permissions:
   geysermenu.open:
     description: 允许为其他玩家打开菜单
     default: op
+  geysermenu.admin:
+    description: 管理员权限 - 包含所有功能权限
+    default: op
+    children:
+      geysermenu.use: true
+      geysermenu.reload: true
+      geysermenu.open: true
+      geysermenu.menu.*: true
   geysermenu.*:
     description: 允许使用所有GeyserMenu功能
     default: op
     children:
       geysermenu.use: true
       geysermenu.reload: true
-      geysermenu.open: true 
+      geysermenu.open: true
+      geysermenu.admin: true
+      geysermenu.menu.*: true
+  geysermenu.menu.*:
+    description: 允许使用所有菜单
+    default: op

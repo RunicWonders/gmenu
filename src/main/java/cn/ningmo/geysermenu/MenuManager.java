@@ -52,29 +52,29 @@ public class MenuManager {
 
                         String fileName = menu.getString("file");
                         if (fileName == null) {
-                            plugin.getLogger().warning("菜单 " + menuKey + " 缺少file配置");
+                            plugin.getLogger().warning(plugin.getLogMessage("menu.load.missing-config", menuKey));
                             return;
                         }
                         if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
-                            plugin.getLogger().warning("检测到不安全的菜单文件名: " + fileName);
+                            plugin.getLogger().warning(plugin.getLogMessage("menu.load.unsafe-filename", fileName));
                         } else {
                             File menuFile = new File(menuFolder, fileName);
                             if (menuFile.exists()) {
                                 menus.put(fileName, YamlConfiguration.loadConfiguration(menuFile));
                                 if (plugin.getConfig().getBoolean("settings.debug")) {
-                                    plugin.getLogger().info("已加载菜单: " + fileName);
+                                    plugin.getLogger().info(plugin.getLogMessage("menu.load.success", fileName));
                                 }
                             } else {
-                                plugin.getLogger().warning("菜单文件不存在: " + fileName);
+                                plugin.getLogger().warning(plugin.getLogMessage("menu.load.missing-file", fileName));
                             }
                         }
                     } catch (NullPointerException e) {
-                        plugin.getLogger().severe("读取菜单 "+menuKey+" 的参数时出现问题, 你是否有值未输入?");
+                        plugin.getLogger().severe(plugin.getLogMessage("menu.load.read-error", menuKey));
                     }
                 });
             }
         } catch (Exception e) {
-            plugin.getLogger().severe("加载菜单时发生错误: " + e.getMessage());
+            plugin.getLogger().severe(plugin.getLogMessage("menu.load.error", e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -86,7 +86,7 @@ public class MenuManager {
             Long lastOpen = formCooldowns.get(player.getUniqueId());
             if (lastOpen != null && now - lastOpen < FORM_COOLDOWN) {
                 if (plugin.getConfig().getBoolean("settings.debug")) {
-                    plugin.getLogger().info("玩家 " + player.getName() + " 打开菜单过快,请求被忽略");
+                    plugin.getLogger().info(plugin.getLogMessage("menu.open.cooldown", player.getName()));
                 }
                 return;
             }
@@ -94,13 +94,14 @@ public class MenuManager {
             formCooldowns.put(player.getUniqueId(), now);
             
             if (player == null || menuName == null) {
-                plugin.getLogger().warning("无效的参数: player=" + player + ", menuName=" + menuName);
+                plugin.getLogger().warning(plugin.getLogMessage("menu.open.invalid-params", 
+                    player != null ? player.getName() : "null", menuName != null ? menuName : "null"));
                 return;
             }
 
             FloodgateApi floodgateApi = FloodgateApi.getInstance();
             if (floodgateApi == null) {
-                plugin.getLogger().severe("Floodgate API 不可用!");
+                plugin.getLogger().severe(plugin.getLogMessage("menu.open.floodgate-unavailable"));
                 return;
             }
 
@@ -110,7 +111,7 @@ public class MenuManager {
             }
 
             String permission = plugin.getConfig().getString("menus." + menuName.replace(".yml", "") + ".permission");
-            if (permission != null && !player.hasPermission(permission)) {
+            if (!plugin.getPermissionManager().hasMenuPermission(player, menuName.replace(".yml", ""))) {
                 player.sendMessage(plugin.getMessage("error.no-menu-permission"));
                 return;
             }
@@ -129,7 +130,7 @@ public class MenuManager {
 
             FloodgatePlayer floodgatePlayer = floodgateApi.getPlayer(player.getUniqueId());
             if (floodgatePlayer == null) {
-                plugin.getLogger().warning("无法获取玩家 " + player.getName() + " 的Floodgate实例");
+                plugin.getLogger().warning(plugin.getLogMessage("menu.open.player-instance-error", player.getName()));
                 return;
             }
 
@@ -142,7 +143,7 @@ public class MenuManager {
             }
 
         } catch (Exception e) {
-            plugin.getLogger().severe("打开菜单时出错: " + e.getMessage());
+            plugin.getLogger().severe(plugin.getLogMessage("menu.open.error", e.getMessage()));
             e.printStackTrace();
             player.sendMessage(plugin.getMessage("error.form-error"));
         } finally {
@@ -224,7 +225,7 @@ public class MenuManager {
                 }
             } catch (NumberFormatException e) {
                 if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                    plugin.getLogger().warning("处理表单响应时出错: " + e.getMessage());
+                    plugin.getLogger().warning(plugin.getLogMessage("form.response-error", e.getMessage()));
                 }
             }
         });
@@ -269,7 +270,7 @@ public class MenuManager {
                 }
             } catch (Exception e) {
                 if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                    plugin.getLogger().warning("处理模态表单响应时出错: " + e.getMessage());
+                    plugin.getLogger().warning(plugin.getLogMessage("form.modal-response-error", e.getMessage()));
                 }
             }
         });
@@ -370,7 +371,7 @@ public class MenuManager {
                 }
             } catch (Exception e) {
                 if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                    plugin.getLogger().warning("处理自定义表单响应时出错: " + e.getMessage());
+                    plugin.getLogger().warning(plugin.getLogMessage("form.custom-response-error", e.getMessage()));
                     e.printStackTrace();
                 }
             }
@@ -450,11 +451,6 @@ public class MenuManager {
         return defaultValue;
     }
     
-    private boolean hasMenuPermission(Player player, String menuKey) {
-        String permission = plugin.getConfig().getString("menus." + menuKey + ".permission");
-        return permission == null || player.hasPermission(permission);
-    }
-
     private boolean isCommandSafe(String command) {
         if (command == null) return false;
 
@@ -462,9 +458,16 @@ public class MenuManager {
             return true;
         }
         
+        String normalizedCommand = command.trim().toLowerCase();
+        if (normalizedCommand.startsWith("/")) {
+            normalizedCommand = normalizedCommand.substring(1);
+        }
+        
         List<String> blockedCommands = plugin.getConfig().getStringList("security.blocked-commands");
         for (String blocked : blockedCommands) {
-            if (command.trim().equalsIgnoreCase(blocked.trim())) {
+            String normalizedBlocked = blocked.trim().toLowerCase();
+            if (normalizedCommand.startsWith(normalizedBlocked + " ") || 
+                normalizedCommand.equals(normalizedBlocked)) {
                 return false;
             }
         }
@@ -526,14 +529,14 @@ public class MenuManager {
             
             return text.replace("&", "§");
         } catch (Exception e) {
-            plugin.getLogger().warning("处理变量时出错: " + e.getMessage());
+            plugin.getLogger().warning(plugin.getLogMessage("placeholder.process-error", e.getMessage()));
             return text;
         }
     }
     
     private String parsePlaceholdersWithCache(Player player, String text) {
         try {
-            String cacheKey = player.getName() + ":" + text;
+            String cacheKey = player.getUniqueId().toString() + ":" + text;
             
             long now = System.currentTimeMillis();
             long cacheTime = plugin.getConfig().getInt("settings.performance.cache-refresh", 30) * 1000L;
@@ -555,7 +558,7 @@ public class MenuManager {
                 return processed.replace("&", "§");
             });
         } catch (Exception e) {
-            plugin.getLogger().warning("处理缓存变量时出错: " + e.getMessage());
+            plugin.getLogger().warning(plugin.getLogMessage("placeholder.cache-error", e.getMessage()));
             return text.replace("&", "§");
         }
     }
@@ -567,7 +570,7 @@ public class MenuManager {
             }
             
             if (!isCommandSafe(command)) {
-                plugin.getLogger().warning("检测到不安全的命令: " + command);
+                plugin.getLogger().warning(plugin.getLogMessage("command-exec.unsafe-detected", command));
                 return;
             }
             
@@ -600,7 +603,7 @@ public class MenuManager {
                 commandTask.run();
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("执行命令时出错: " + e.getMessage());
+            plugin.getLogger().warning(plugin.getLogMessage("command-exec.execute-error", e.getMessage()));
             player.sendMessage(plugin.getMessage("error.command-error"));
         }
     }
@@ -646,7 +649,7 @@ public class MenuManager {
             return getDefaultFormImage();
         } catch (Exception e) {
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                plugin.getLogger().warning("处理图标时出错: " + e.getMessage());
+                plugin.getLogger().warning(plugin.getLogMessage("icon.process-error", e.getMessage()));
             }
             return getDefaultFormImage();
         }

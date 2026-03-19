@@ -15,6 +15,7 @@ public class GeyserMenu extends JavaPlugin {
     private MenuManager menuManager;
     private YamlConfiguration messages;
     private BStatsManager bStatsManager;
+    private PermissionManager permissionManager;
     
     // 添加更新检查相关字段
     private static final String UPDATE_URL = "https://api.github.com/repos/ning-g-mo/gmenu/releases/latest";
@@ -26,14 +27,14 @@ public class GeyserMenu extends JavaPlugin {
         try {
             // 防止重复初始化
             if (instance != null) {
-                getLogger().warning("检测到插件重复加载!");
+                getLogger().warning(getLogMessage("plugin.load.duplicate"));
                 return;
             }
             instance = this;
             
             // 检查前置插件
             if (!checkDependencies()) {
-                getLogger().severe("缺少必要的前置插件，插件将被禁用!");
+                getLogger().severe(getLogMessage("plugin.dependency.missing"));
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
@@ -41,24 +42,32 @@ public class GeyserMenu extends JavaPlugin {
             // 保存默认配置
             saveDefaultConfig();
             
-            // 保存其他配置文件
+            // 执行配置迁移
+            ConfigMigrator migrator = new ConfigMigrator(this);
+            migrator.migrate();
+            
+            // 重新加载配置以应用迁移后的更改
+            super.reloadConfig();
+            
             saveResource("messages.yml", false);
+            saveResource("messages_en.yml", false);
             saveResource("menus/menu.yml", false);
             saveResource("menus/shop.yml", false);
             saveResource("menus/teleport.yml", false);
             saveResource("menus/confirm.yml", false);
             saveResource("menus/settings.yml", false);
             
-            // 创建必要的目录
             createDirectories();
             
-            // 加载消息配置
             reloadMessages();
             
             // 检查更新
             if (getConfig().getBoolean("settings.check-updates", true)) {
                 checkUpdate();
             }
+            
+            // 初始化权限管理器
+            permissionManager = new PermissionManager(this);
             
             // 初始化菜单管理器
             menuManager = new MenuManager(this);
@@ -70,7 +79,7 @@ public class GeyserMenu extends JavaPlugin {
             if (getCommand("geysermenu") != null) {
                 getCommand("geysermenu").setExecutor(new MenuCommand(this));
             } else {
-                getLogger().severe("命令注册失败!");
+                getLogger().severe(getLogMessage("plugin.command.register-failed"));
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
@@ -79,9 +88,9 @@ public class GeyserMenu extends JavaPlugin {
             bStatsManager = new BStatsManager(this);
             bStatsManager.initialize();
             
-            getLogger().info("GeyserMenu v" + getPluginMeta().getVersion() + " 已成功加载!");
+            getLogger().info(getLogMessage("plugin.load.success", getPluginMeta().getVersion()));
         } catch (Exception e) {
-            getLogger().severe("插件加载时发生错误: " + e.getMessage());
+            getLogger().severe(getLogMessage("plugin.load.error", e.getMessage()));
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
@@ -106,22 +115,37 @@ public class GeyserMenu extends JavaPlugin {
             // 清除实例
             instance = null;
             
-            getLogger().info("GeyserMenu 已卸载!");
+            getLogger().info(getLogMessage("plugin.disable.success"));
         } catch (Exception e) {
-            getLogger().severe("插件卸载时发生错误: " + e.getMessage());
+            getLogger().severe(getLogMessage("plugin.disable.error", e.getMessage()));
             e.printStackTrace();
         }
     }
     
     public void reloadMessages() {
         try {
-            File messagesFile = new File(getDataFolder(), "messages.yml");
+            String language = getConfig().getString("settings.language", "zh_cn");
+            String messagesFileName = "messages.yml";
+            String resourceFileName = "messages.yml";
+            
+            if ("en".equalsIgnoreCase(language)) {
+                messagesFileName = "messages_en.yml";
+                resourceFileName = "messages_en.yml";
+            }
+            
+            File messagesFile = new File(getDataFolder(), messagesFileName);
             if (!messagesFile.exists()) {
-                saveResource("messages.yml", false);
+                saveResource(resourceFileName, false);
+                if (!messagesFile.exists() && !messagesFileName.equals("messages.yml")) {
+                    messagesFile = new File(getDataFolder(), "messages.yml");
+                    if (!messagesFile.exists()) {
+                        saveResource("messages.yml", false);
+                    }
+                }
             }
             messages = YamlConfiguration.loadConfiguration(messagesFile);
         } catch (Exception e) {
-            getLogger().severe("加载消息配置时发生错误: " + e.getMessage());
+            getLogger().severe(getLogMessage("config.load-error", e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -130,14 +154,13 @@ public class GeyserMenu extends JavaPlugin {
         try {
             String message = messages.getString(path);
             if (message == null) {
-                getLogger().warning("找不到消息配置: " + path);
-                return "§c消息未配置: " + path;
+                getLogger().warning(getLogMessage("message.not-found", path));
+                return getLogMessage("message.not-configured", path);
             }
             
             StringBuilder result = new StringBuilder(getPrefix());
             String formattedMessage = message;
             
-            // 替换参数
             for (int i = 0; i < args.length; i++) {
                 formattedMessage = formattedMessage.replace("{" + i + "}", args[i] != null ? args[i] : "null");
             }
@@ -145,48 +168,49 @@ public class GeyserMenu extends JavaPlugin {
             result.append(formattedMessage);
             return result.toString();
         } catch (Exception e) {
-            getLogger().warning("获取消息时出错: " + path + ", 错误: " + e.getMessage());
-            return "§c消息处理错误: " + path;
+            getLogger().warning(getLogMessage("message.process-error", path) + ", 错误: " + e.getMessage());
+            return getLogMessage("message.process-error", path);
         }
     }
     
     public String getRawMessage(String path) {
         try {
-            return messages.getString(path, "§c消息未配置: " + path);
+            return messages.getString(path, getLogMessage("message.not-configured", path));
         } catch (Exception e) {
-            getLogger().warning("获取原始消息时出错: " + path);
-            return "§c消息处理错误: " + path;
+            getLogger().warning(getLogMessage("message.raw-error", path));
+            return getLogMessage("message.process-error", path);
         }
+    }
+    
+    public String getLogMessage(String path, String... args) {
+        try {
+            String message = messages.getString(path);
+            if (message == null) {
+                getLogger().warning("找不到消息配置: " + path);
+                return "消息未配置: " + path;
+            }
+            
+            String formattedMessage = message;
+            for (int i = 0; i < args.length; i++) {
+                formattedMessage = formattedMessage.replace("{" + i + "}", args[i] != null ? args[i] : "null");
+            }
+            
+            return formattedMessage;
+        } catch (Exception e) {
+            getLogger().warning(getLogMessage("message.process-error", path) + ", 错误: " + e.getMessage());
+            return getLogMessage("message.process-error", path);
+        }
+    }
+    
+    public String getPermissionDescription(String key) {
+        return messages.getString("permission." + key, key);
     }
     
     private boolean checkDependencies() {
         try {
             return getServer().getPluginManager().getPlugin("floodgate") != null;
         } catch (Exception e) {
-            getLogger().severe("检查依赖时发生错误: " + e.getMessage());
-            return false;
-        }
-    }
-    
-    private boolean checkConfig() {
-        try {
-            // 检查配置文件版本
-            if (!getConfig().isString("settings.default-menu")) {
-                getLogger().warning("配置文件缺少必要设置");
-                return false;
-            }
-            
-            // 检查消息文件
-            File messagesFile = new File(getDataFolder(), "messages.yml");
-            if (!messagesFile.exists()) {
-                getLogger().warning("消息配置文件不存在");
-                return false;
-            }
-            
-            return true;
-        } catch (Exception e) {
-            getLogger().severe("检查配置文件时发生错误: " + e.getMessage());
-            e.printStackTrace();
+            getLogger().severe(getLogMessage("plugin.dependency.error", e.getMessage()));
             return false;
         }
     }
@@ -222,6 +246,10 @@ public class GeyserMenu extends JavaPlugin {
     
     public BStatsManager getBStatsManager() {
         return bStatsManager;
+    }
+    
+    public PermissionManager getPermissionManager() {
+        return permissionManager;
     }
     
     public String getPrefix() {

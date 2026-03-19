@@ -1,9 +1,14 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.3.0-beta1
+# 版本: 1.3.0-beta2
+# 配置版本号 - 用于自动迁移配置
+config-version: 3
 
 # 插件基础设置
 settings:
+  # 语言设置 - 支持的语言: zh_cn (中文), en (英文)
+  language: "zh_cn"
+  
   # 默认菜单文件名 - 当玩家直接使用/gmenu时打开的菜单
   default-menu: "menu.yml"
   
