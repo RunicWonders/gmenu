@@ -25,6 +25,13 @@ public class GeyserMenu extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            // 首先保存资源，因为 reloadMessages 需要它们
+            saveResource("messages.yml", false);
+            saveResource("messages_en.yml", false);
+            
+            // 立即加载消息，以便后续可以使用 getLogMessage
+            reloadMessages();
+            
             // 防止重复初始化
             if (instance != null) {
                 getLogger().warning(getLogMessage("plugin.load.duplicate"));
@@ -49,8 +56,6 @@ public class GeyserMenu extends JavaPlugin {
             // 重新加载配置以应用迁移后的更改
             super.reloadConfig();
             
-            saveResource("messages.yml", false);
-            saveResource("messages_en.yml", false);
             saveResource("menus/menu.yml", false);
             saveResource("menus/shop.yml", false);
             saveResource("menus/teleport.yml", false);
@@ -58,8 +63,6 @@ public class GeyserMenu extends JavaPlugin {
             saveResource("menus/settings.yml", false);
             
             createDirectories();
-            
-            reloadMessages();
             
             // 检查更新
             if (getConfig().getBoolean("settings.check-updates", true)) {
@@ -90,7 +93,7 @@ public class GeyserMenu extends JavaPlugin {
             
             getLogger().info(getLogMessage("plugin.load.success", getPluginMeta().getVersion()));
         } catch (Exception e) {
-            getLogger().severe(getLogMessage("plugin.load.error", e.getMessage()));
+            getLogger().severe("插件加载过程中发生致命错误: " + e.getMessage());
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
@@ -99,6 +102,9 @@ public class GeyserMenu extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
+            // 保存配置
+            saveConfig();
+            
             // 清理资源
             if (menuManager != null) {
                 menuManager.getMenuList().clear();
@@ -117,7 +123,7 @@ public class GeyserMenu extends JavaPlugin {
             
             getLogger().info(getLogMessage("plugin.disable.success"));
         } catch (Exception e) {
-            getLogger().severe(getLogMessage("plugin.disable.error", e.getMessage()));
+            getLogger().severe("插件关闭过程中发生错误: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -145,17 +151,20 @@ public class GeyserMenu extends JavaPlugin {
             }
             messages = YamlConfiguration.loadConfiguration(messagesFile);
         } catch (Exception e) {
-            getLogger().severe(getLogMessage("config.load-error", e.getMessage()));
+            getLogger().severe("加载消息配置时发生错误: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
     public String getMessage(String path, String... args) {
+        if (messages == null) {
+            return "§6[GeyserMenu] §f" + path;
+        }
         try {
             String message = messages.getString(path);
             if (message == null) {
-                getLogger().warning(getLogMessage("message.not-found", path));
-                return getLogMessage("message.not-configured", path);
+                getLogger().warning("找不到消息配置: " + path);
+                return getPrefix() + "§c消息未配置: " + path;
             }
             
             StringBuilder result = new StringBuilder(getPrefix());
@@ -168,21 +177,27 @@ public class GeyserMenu extends JavaPlugin {
             result.append(formattedMessage);
             return result.toString();
         } catch (Exception e) {
-            getLogger().warning(getLogMessage("message.process-error", path) + ", 错误: " + e.getMessage());
-            return getLogMessage("message.process-error", path);
+            getLogger().warning("获取消息时发生错误: " + path + ", 错误: " + e.getMessage());
+            return "§c消息处理错误: " + path;
         }
     }
     
     public String getRawMessage(String path) {
+        if (messages == null) {
+            return path;
+        }
         try {
-            return messages.getString(path, getLogMessage("message.not-configured", path));
+            return messages.getString(path, path);
         } catch (Exception e) {
-            getLogger().warning(getLogMessage("message.raw-error", path));
-            return getLogMessage("message.process-error", path);
+            getLogger().warning("获取原始消息时发生错误: " + path + ", 错误: " + e.getMessage());
+            return path;
         }
     }
     
     public String getLogMessage(String path, String... args) {
+        if (messages == null) {
+            return "消息系统未就绪: " + path;
+        }
         try {
             String message = messages.getString(path);
             if (message == null) {
@@ -197,12 +212,15 @@ public class GeyserMenu extends JavaPlugin {
             
             return formattedMessage;
         } catch (Exception e) {
-            getLogger().warning(getLogMessage("message.process-error", path) + ", 错误: " + e.getMessage());
-            return getLogMessage("message.process-error", path);
+            getLogger().warning("获取日志消息时发生错误: " + path + ", 错误: " + e.getMessage());
+            return "日志消息处理错误: " + path;
         }
     }
     
     public String getPermissionDescription(String key) {
+        if (messages == null) {
+            return key;
+        }
         return messages.getString("permission." + key, key);
     }
     
@@ -210,7 +228,7 @@ public class GeyserMenu extends JavaPlugin {
         try {
             return getServer().getPluginManager().getPlugin("floodgate") != null;
         } catch (Exception e) {
-            getLogger().severe(getLogMessage("plugin.dependency.error", e.getMessage()));
+            getLogger().severe("检查插件依赖时出错: " + e.getMessage());
             return false;
         }
     }
@@ -253,10 +271,13 @@ public class GeyserMenu extends JavaPlugin {
     }
     
     public String getPrefix() {
+        if (messages == null) {
+            return "§6[GeyserMenu] §f";
+        }
         try {
             return messages.getString("prefix", "§6[GeyserMenu] §f");
         } catch (Exception e) {
-            getLogger().warning("获取前缀时出错");
+            getLogger().warning("获取前缀时出错: " + e.getMessage());
             return "§6[GeyserMenu] §f";
         }
     }
