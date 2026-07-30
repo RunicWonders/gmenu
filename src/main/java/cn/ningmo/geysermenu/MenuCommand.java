@@ -30,12 +30,10 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
                     }
                     sender.sendMessage(plugin.getMessage("reload.start"));
                     plugin.reloadConfig();
-                    plugin.reloadMessages();
-                    plugin.getMenuManager().loadMenus();
-                    permissionManager.clearAllCache();
+                    permissionManager.refreshMenuPermissions();
                     sender.sendMessage(plugin.getMessage("reload.success"));
                     return true;
-                    
+
                 case "open":
                     if (!permissionManager.hasOpenPermission(sender)) {
                         sender.sendMessage(plugin.getMessage("error.no-permission"));
@@ -50,17 +48,28 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
                         sender.sendMessage(plugin.getMessage("error.player-not-found", args[1]));
                         return true;
                     }
-                    plugin.getMenuManager().openMenu(target, args[2]);
-                    sender.sendMessage(plugin.getMessage("command.open.success", target.getName()));
+                    if (plugin.getMenuManager().openMenu(target, args[2])) {
+                        sender.sendMessage(plugin.getMessage("command.open.success", target.getName()));
+                    } else if (!plugin.getMenuManager().getMenuList().contains(args[2])) {
+                        sender.sendMessage(plugin.getMessage("error.menu-not-found"));
+                    } else {
+                        // 菜单存在但表单发送失败，目标玩家已收到具体原因提示
+                        sender.sendMessage(plugin.getMessage("error.form-error"));
+                    }
                     return true;
-                    
+
                 case "help":
                     sendHelpMessage(sender);
+                    return true;
+
+                default:
+                    // 未知子命令，提示而不是静默打开默认菜单
+                    sender.sendMessage(plugin.getMessage("error.unknown-command"));
                     return true;
             }
         }
         
-        // 如果没有参数或参数不匹配任何子命令
+        // 没有参数：玩家打开默认菜单，控制台显示帮助信息
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (!permissionManager.hasUsePermission(player)) {
@@ -69,12 +78,7 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
             }
             plugin.getMenuManager().openMenu(player, plugin.getConfig().getString("settings.default-menu", "menu.yml"));
         } else {
-            // 如果是控制台且没有有效的子命令，显示帮助信息
-            if (args.length == 0) {
-                sendHelpMessage(sender);
-            } else {
-                sender.sendMessage(plugin.getMessage("error.unknown-command"));
-            }
+            sendHelpMessage(sender);
         }
         return true;
     }

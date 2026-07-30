@@ -1,6 +1,6 @@
 # GeyserMenu 配置文件
 # 作者: 柠枺
-# 版本: 1.3.0-beta4
+# 版本: 1.3.0-beta5
 # 配置版本号 - 用于自动迁移配置
 config-version: 3
 
@@ -512,22 +512,3 @@ security:
   
   # 是否检查文件路径安全性 - 防止目录遍历攻击
   check-file-path: true
-
-# 权限节点配置
-permissions:
-  geysermenu.menu.*:
-    description: 允许使用所有菜单
-    default: op
-    children:
-      geysermenu.menu.main: true
-      geysermenu.menu.teleport: true
-      geysermenu.menu.shop: true
-      geysermenu.menu.confirm: true
-      geysermenu.menu.settings: true
-
-# 错误消息配置
-messages:
-  error:
-    no-menu-permission: "§c你没有权限使用此菜单!"
-    invalid-menu: "§c无效的菜单配置!"
-    command-blocked: "§c此命令已被禁用!"

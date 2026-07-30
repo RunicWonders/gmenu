@@ -1,4 +1,6 @@
 # 主菜单配置
+# 注意: 本文件中的 %server_online% 占位符依赖 PlaceholderAPI 的 Server 扩展,
+# 未安装时占位符将按原文显示(如 "%server_online%")
 menu:
   # 菜单标题 - 显示在表单最上方
   title: "主菜单"
@@ -21,7 +23,7 @@ menu:
       icon_type: "java"
       submenu: "teleport.yml"
     
-    # 使用基岭版材质路径
+    # 使用基岩版材质路径
     - text: "商店菜单"
       description: "打开商店菜单"
       icon: "textures/items/diamond"

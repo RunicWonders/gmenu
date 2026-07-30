@@ -80,7 +80,7 @@ menu:
   button2: "Cancel"
   
   on_button1:
-    command: "eco take {player} 100 && give {player} diamond 1"
+    command: "eco take {player} 100"
     execute_as: console
   
   on_button2:
@@ -249,6 +249,17 @@ on_submit:
 :::tip Note
 Label components are not indexed, only input-type components are indexed.
 :::
+
+For dropdown components, the `{n}` value is the selected option's **text**, not its index. For example, if the player selects "English", `{0}` is replaced with `English`.
+
+### Built-in Placeholders
+
+Besides PlaceholderAPI variables (such as `%player_name%`, which require PlaceholderAPI to be installed), GeyserMenu provides the built-in `{player}` placeholder. It is replaced with the current player's name in commands and component defaults, and works without PlaceholderAPI:
+
+```yaml
+on_submit:
+  command: "give {player} diamond 1"
+```
 
 ## Best Practices
 

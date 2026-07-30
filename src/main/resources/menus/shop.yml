@@ -1,3 +1,7 @@
+# 商店菜单示例
+# 注意: 示例命令 "shop blocks"/"shop items" 依赖 ShopGUIPlus 插件,
+# %vault_eco_balance% 占位符依赖 Vault 及 PlaceholderAPI 的 Vault 扩展,
+# 未安装对应插件时命令无法执行、占位符将按原文显示
 menu:
   title: "§a商店菜单"
   subtitle: "§7选择要浏览的商店类型"
@@ -12,17 +16,17 @@ menu:
       icon: "arrow"
       icon_type: "java"
       submenu: "menu.yml"
-    
+
     - text: "§e方块商店"
       description: "购买各种建筑方块"
       icon: "grass_block"
       icon_type: "java"
       command: "shop blocks"
       execute_as: "player"
-    
+
     - text: "§b物品商店"
       description: "购买各种特殊物品"
       icon: "textures/items/diamond"
       icon_type: "bedrock"
       command: "shop items"
-      execute_as: "player" 
+      execute_as: "player"

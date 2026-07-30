@@ -45,7 +45,7 @@ update:
   
   player:
     available: "§eNew version v{0} is available"
-    current: "§7Current version: v{1}"
+    current: "§7Current version: v{0}"
     download: "§6Download URL: §f{0}"
     click-to-download: "§aClick to open download page"
 

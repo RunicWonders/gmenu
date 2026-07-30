@@ -2,20 +2,20 @@
 
 一个轻量化且简单的基岩版自定义表单插件。
 
-## 最新版本：v1.2.0
+## 当前版本：v1.3.0-beta5
 
-### 更新内容
-- 更新依赖到 Paper API 1.21.4+
-- 迁移 Chat API 到 Adventure (Kyori)
-- 更新 bStats 到 3.2.1
-- 更新 org.json 到 20250107
-- 完善菜单类型和权限配置文档
-- 优化菜单配置说明
-- 修正文档中的术语（"基岭版"统一修正为"基岩版"）
+### 近期更新
+- 支持 SimpleForm、ModalForm 和 CustomForm 三种表单类型
+- 支持标签、输入框、下拉框、滑块和开关组件
+- 修复自定义表单响应解析，支持下拉框文本和 `{player}` 占位符
+- 增加菜单级权限、命令安全检查和 URL 图标域名限制
+- 支持配置和消息文件自动迁移，重载时按配置清理运行时缓存
+- 增加更新检查和进服更新提示
+- 更新依赖到 Paper API 1.21.4+、bStats 3.2.1 和 org.json 20250107
 
 ## 环境要求
 
-- Minecraft 服务器: Paper 1.21.4 或更高版本
+- Minecraft 服务器: Paper 1.21.4 或更高版本（仅支持 Paper，不支持 Spigot）
 - Java: 21 或更高版本
 - 前置插件: Floodgate
 
@@ -26,9 +26,10 @@
 - 支持多菜单配置
 - 支持无限层级子菜单
 - 支持PlaceholderAPI变量
-- 支持两种图标类型：
-  - Java版物品ID (使用 `icon_type: "java"`)
-  - 基岩版材质路径 (使用 `icon_type: "bedrock"`)
+- 支持三种图标类型：
+  - Java版物品 ID（使用 `icon_type: "java"`）
+  - 基岩版材质路径（使用 `icon_type: "bedrock"`）
+  - HTTPS URL 图标（使用 `icon_type: "url"`）
 - 集成 BStats 统计功能（可配置）
 
 ### 命令系统
@@ -40,28 +41,38 @@
 ### 命令列表
 - `/gmenu` - 打开默认菜单
 - `/gmenu help` - 显示帮助信息
-- `/gmenu reload` - 重载配置文件 (需要权限: geysermenu.reload)
-- `/gmenu open <玩家名> <菜单名>` - 为指定玩家打开菜单 (需要权限: geysermenu.open)
+- `/gmenu reload` - 重载配置、消息和菜单（需要权限：`geysermenu.reload`）
+- `/gmenu open <玩家名> <菜单名>` - 为指定玩家打开菜单（需要权限：`geysermenu.open`）
 
 ### 权限节点
-- `geysermenu.use` - 允许使用菜单命令 (默认: true)
-- `geysermenu.reload` - 允许重载配置 (默认: op)
-- `geysermenu.open` - 允许为其他玩家打开菜单 (默认: op)
-- `geysermenu.*` - 允许使用所有功能 (默认: op)
+- `geysermenu.use` - 使用默认菜单（默认：true）
+- `geysermenu.reload` - 重载配置（默认：op）
+- `geysermenu.open` - 为其他玩家打开菜单（默认：op）
+- `geysermenu.admin` - 管理员权限，包含全部功能（默认：op）
+- `geysermenu.menu.*` - 使用所有菜单（默认：op）
+- `geysermenu.menu.<菜单键>` - 使用指定菜单，权限由 `config.yml` 中的菜单配置决定
+- `geysermenu.*` - 使用所有功能（默认：op）
 
 ### 菜单配置
 - 支持通过config.yml启用/禁用菜单
 - 支持自定义菜单标题和按钮
 - 支持自定义按钮图标和命令
--  - 支持物品ID图标 (例如: `minecraft:diamond`)
--  - 支持URL图标 (使用 `icon_type: "url"`)
--  - 支持自定义路径图标 (使用 `icon_type: "path"` 和 `icon_path`)
+  - 支持物品 ID 图标（使用 `icon_type: "java"`）
+  - 支持基岩版材质路径（使用 `icon_type: "bedrock"`）
+  - 支持 HTTPS URL 图标（使用 `icon_type: "url"`）
 - 支持菜单间的相互跳转
 - 支持菜单副标题和简介
 - 支持按钮描述文本
 - 支持表单页脚文本
-- 支持颜色代码 (使用§或&)
-- 支持多行文本 (使用 |- 语法)
+- 支持颜色代码（使用 `§` 或 `&`）
+- 支持多行文本（使用 `|-` 语法）
+
+### 表单类型
+- `simple`：多按钮导航菜单
+- `modal`：确认/取消双按钮表单
+- `custom`：包含 `label`、`input`、`dropdown`、`slider` 和 `toggle` 组件的自定义表单
+
+完整表单配置示例请查看 [表单类型文档](docs/guide/form-types.md)。
 
 ## 图标支持
 
@@ -107,4 +118,21 @@ settings:
 - 不收集服务器IP、玩家信息等敏感数据
 - 可以随时在配置中禁用
 
-详细信息请查看 [BSTATS.md](BSTATS.md) 文件。
+## 安全设置
+
+默认启用命令安全检查，会拦截 `op`、`deop`、`stop` 和 `reload` 等命令，并拒绝命令中的 `;`、`|`、`&` 和反引号。不要在不可信配置中关闭此功能。
+
+URL 图标默认仅允许 HTTPS；可在 `icons.url.allowed-domains` 中限制允许的域名。
+
+## 配置与文档
+
+- 主配置：`src/main/resources/config.yml`（服务器运行后位于插件数据目录）
+- 表单类型：[docs/guide/form-types.md](docs/guide/form-types.md)
+- 统计说明：[BSTATS.md](BSTATS.md)
+- 贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)
+
+详细统计说明请查看 [BSTATS.md](BSTATS.md) 文件。
+
+## 许可证
+
+本项目使用 [MIT License](LICENSE)。

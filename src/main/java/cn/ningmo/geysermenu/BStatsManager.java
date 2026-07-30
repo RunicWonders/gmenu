@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * BStats 统计管理器
@@ -23,6 +25,24 @@ public class BStatsManager {
     
     // BStats 插件 ID
     private static final int PLUGIN_ID = 26736;
+
+    // 图表统计值使用固定英文常量，避免不同语言服务器的统计值碎片化（文案与 messages_en.yml 保持一致）
+    private static final String LABEL_PAPI_CACHE = "PAPI Cache";
+    private static final String LABEL_COMMAND_SECURITY = "Command Security";
+    private static final String LABEL_UPDATE_CHECK = "Update Check";
+    private static final String LABEL_DEBUG_MODE = "Debug Mode";
+    private static final String LABEL_PLACEHOLDERAPI = "PlaceholderAPI";
+    private static final String LABEL_MAIN_MENU = "Main Menu";
+    private static final String LABEL_TELEPORT_MENU = "Teleport Menu";
+    private static final String LABEL_SHOP_MENU = "Shop Menu";
+    private static final String LABEL_HIGH_PERFORMANCE = "High Performance";
+    private static final String LABEL_MEDIUM_PERFORMANCE = "Medium Performance";
+    private static final String LABEL_DEFAULT_PERFORMANCE = "Default Performance";
+
+    // 服务器版本：提取 1.x 主版本号（如 1.21.4-R0.1-SNAPSHOT -> 1.21）
+    private static final Pattern SERVER_MAJOR_PATTERN = Pattern.compile("1\\.\\d+");
+    // Java 版本：提取主版本号，兼容 1.8 与 9+ 两种格式
+    private static final Pattern JAVA_MAJOR_PATTERN = Pattern.compile("^(?:1\\.(\\d+)|(\\d+)).*$");
     
     public BStatsManager(GeyserMenu plugin) {
         this.plugin = plugin;
@@ -65,21 +85,19 @@ public class BStatsManager {
         
         // 服务器版本统计
         metrics.addCustomChart(new SimplePie("server_version", () -> {
-            String version = Bukkit.getVersion();
-            if (version.contains("1.21")) return "1.21.x";
-            if (version.contains("1.20")) return "1.20.x";
-            if (version.contains("1.19")) return "1.19.x";
-            if (version.contains("1.18")) return "1.18.x";
-            return "Other";
+            // 通用解析：提取 1.x 主版本号作为值，解析失败归入 Other
+            Matcher matcher = SERVER_MAJOR_PATTERN.matcher(Bukkit.getVersion());
+            return matcher.find() ? matcher.group() : "Other";
         }));
         
         // Java 版本统计
         metrics.addCustomChart(new SimplePie("java_version", () -> {
-            String javaVersion = System.getProperty("java.version");
-            if (javaVersion.startsWith("21")) return "Java 21";
-            if (javaVersion.startsWith("17")) return "Java 17";
-            if (javaVersion.startsWith("11")) return "Java 11";
-            if (javaVersion.startsWith("8")) return "Java 8";
+            // 通用解析：提取主版本号，解析失败归入 Other
+            Matcher matcher = JAVA_MAJOR_PATTERN.matcher(System.getProperty("java.version", ""));
+            if (matcher.matches()) {
+                String major = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+                return "Java " + major;
+            }
             return "Other";
         }));
         
@@ -102,23 +120,23 @@ public class BStatsManager {
             Map<String, Integer> valueMap = new HashMap<>();
             
             if (plugin.getConfig().getBoolean("settings.performance.cache-placeholders", false)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.papi-cache"), 1);
+                valueMap.put(LABEL_PAPI_CACHE, 1);
             }
             
             if (plugin.getConfig().getBoolean("settings.enable-command-security", true)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.command-security"), 1);
+                valueMap.put(LABEL_COMMAND_SECURITY, 1);
             }
             
             if (plugin.getConfig().getBoolean("settings.check-updates", true)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.update-check"), 1);
+                valueMap.put(LABEL_UPDATE_CHECK, 1);
             }
             
             if (plugin.getConfig().getBoolean("settings.debug", false)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.debug-mode"), 1);
+                valueMap.put(LABEL_DEBUG_MODE, 1);
             }
             
             if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.placeholderapi"), 1);
+                valueMap.put(LABEL_PLACEHOLDERAPI, 1);
             }
             
             return valueMap;
@@ -140,15 +158,15 @@ public class BStatsManager {
             Map<String, Integer> valueMap = new HashMap<>();
             
             if (plugin.getConfig().getBoolean("menus.main.enable", true)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.main-menu"), 1);
+                valueMap.put(LABEL_MAIN_MENU, 1);
             }
             
             if (plugin.getConfig().getBoolean("menus.teleport.enable", true)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.teleport-menu"), 1);
+                valueMap.put(LABEL_TELEPORT_MENU, 1);
             }
             
             if (plugin.getConfig().getBoolean("menus.shop.enable", true)) {
-                valueMap.put(plugin.getLogMessage("statistics.labels.shop-menu"), 1);
+                valueMap.put(LABEL_SHOP_MENU, 1);
             }
             
             return valueMap;
@@ -159,26 +177,10 @@ public class BStatsManager {
             int commandDelay = plugin.getConfig().getInt("settings.performance.command-delay", 0);
             boolean cacheEnabled = plugin.getConfig().getBoolean("settings.performance.cache-placeholders", false);
             
-            if (cacheEnabled && commandDelay > 0) return plugin.getLogMessage("statistics.labels.high-performance");
-            if (cacheEnabled || commandDelay > 0) return plugin.getLogMessage("statistics.labels.medium-performance");
-            return plugin.getLogMessage("statistics.labels.default-performance");
+            if (cacheEnabled && commandDelay > 0) return LABEL_HIGH_PERFORMANCE;
+            if (cacheEnabled || commandDelay > 0) return LABEL_MEDIUM_PERFORMANCE;
+            return LABEL_DEFAULT_PERFORMANCE;
         }));
-    }
-    
-    /**
-     * 获取 Metrics 实例
-     * @return Metrics 实例，如果未初始化则返回 null
-     */
-    public Metrics getMetrics() {
-        return metrics;
-    }
-    
-    /**
-     * 检查 BStats 是否已启用
-     * @return 如果已启用返回 true
-     */
-    public boolean isEnabled() {
-        return metrics != null;
     }
     
     /**
@@ -187,7 +189,8 @@ public class BStatsManager {
     public void shutdown() {
         if (metrics != null) {
             try {
-                // BStats 会自动处理关闭逻辑
+                // 先停止 bStats 的上报任务，再释放引用，避免插件关闭后任务泄漏
+                metrics.shutdown();
                 metrics = null;
                 plugin.getLogger().info(plugin.getRawMessage("statistics.console.shutdown"));
             } catch (Exception e) {

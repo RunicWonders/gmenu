@@ -6,15 +6,9 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.Bukkit;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PermissionManager {
     private final GeyserMenu plugin;
-    private final Map<UUID, Map<String, Boolean>> permissionCache;
-    private final Map<String, Permission> registeredPermissions;
     
     public static final String PERMISSION_USE = "geysermenu.use";
     public static final String PERMISSION_RELOAD = "geysermenu.reload";
@@ -24,8 +18,6 @@ public class PermissionManager {
     
     public PermissionManager(GeyserMenu plugin) {
         this.plugin = plugin;
-        this.permissionCache = new ConcurrentHashMap<>();
-        this.registeredPermissions = new HashMap<>();
         registerPermissions();
     }
     
@@ -42,17 +34,12 @@ public class PermissionManager {
     }
     
     private void registerPermission(PluginManager pm, String name, String description, PermissionDefault defaultValue) {
-        Permission perm = pm.getPermission(name);
-        if (perm == null) {
-            perm = new Permission(name, description, defaultValue);
-            pm.addPermission(perm);
+        if (pm.getPermission(name) == null) {
+            pm.addPermission(new Permission(name, description, defaultValue));
         }
-        registeredPermissions.put(name, perm);
     }
     
     private void registerMenuPermissions() {
-        if (plugin.getConfig() == null) return;
-        
         var section = plugin.getConfig().getConfigurationSection("menus");
         if (section == null) return;
         
@@ -60,12 +47,16 @@ public class PermissionManager {
         
         for (String menuKey : section.getKeys(false)) {
             var menuSection = section.getConfigurationSection(menuKey);
-            if (menuSection == null) continue;
+            if (menuSection == null) {
+                // 标量型条目不是有效的菜单配置节，跳过并告警
+                plugin.getLogger().warning("配置项 menus." + menuKey + " 不是有效的菜单配置节，已跳过权限注册");
+                continue;
+            }
             
             String permission = menuSection.getString("permission");
             if (permission != null && !permission.isEmpty()) {
                 registerPermission(pm, permission, 
-                    plugin.getPermissionDescription("menu-template").replace("{0}", menuKey), PermissionDefault.OP);
+                    plugin.getPermissionDescription("menu-template").replace("{0}", menuKey), PermissionDefault.TRUE);
             }
         }
     }
@@ -77,27 +68,6 @@ public class PermissionManager {
         
         if (sender.hasPermission(PERMISSION_ADMIN)) {
             return true;
-        }
-        
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            Map<String, Boolean> playerCache = permissionCache.get(player.getUniqueId());
-            if (playerCache != null) {
-                Boolean cached = playerCache.get(permission);
-                if (cached != null) {
-                    return cached;
-                }
-            }
-            
-            boolean hasPermission = sender.hasPermission(permission);
-            
-            if (playerCache == null) {
-                playerCache = new HashMap<>();
-                permissionCache.put(player.getUniqueId(), playerCache);
-            }
-            playerCache.put(permission, hasPermission);
-            
-            return hasPermission;
         }
         
         return sender.hasPermission(permission);
@@ -140,19 +110,7 @@ public class PermissionManager {
         return hasPermission(sender, PERMISSION_ADMIN);
     }
     
-    public void clearCache(UUID playerId) {
-        permissionCache.remove(playerId);
-    }
-    
-    public void clearAllCache() {
-        permissionCache.clear();
-    }
-    
     public void refreshMenuPermissions() {
         registerMenuPermissions();
-    }
-    
-    public void onPlayerQuit(UUID playerId) {
-        permissionCache.remove(playerId);
     }
 }

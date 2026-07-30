@@ -11,6 +11,9 @@ import net.kyori.adventure.text.event.HoverEvent;
 
 public class PlayerListener implements Listener {
 
+    // 更新提示中的插件下载链接
+    private static final String DOWNLOAD_URL = "https://github.com/RunicWonders/gmenu/releases/latest";
+
     private final GeyserMenu plugin;
 
     public PlayerListener(GeyserMenu plugin) {
@@ -37,9 +40,8 @@ public class PlayerListener implements Listener {
                     
                 // 发送可点击的下载链接
                 Component message = Component.text(
-                    plugin.getMessage("update.player.download", 
-                        "https://github.com/ning-g-mo/gmenu/releases/latest"))
-                    .clickEvent(ClickEvent.openUrl("https://github.com/ning-g-mo/gmenu/releases/latest"))
+                    plugin.getMessage("update.player.download", DOWNLOAD_URL))
+                    .clickEvent(ClickEvent.openUrl(DOWNLOAD_URL))
                     .hoverEvent(HoverEvent.showText(Component.text(
                         plugin.getMessage("update.player.click-to-download"))));
                 player.sendMessage(message);

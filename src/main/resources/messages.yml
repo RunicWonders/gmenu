@@ -47,7 +47,7 @@ update:
   # 玩家消息
   player:
     available: "§e发现新版本 v{0} 可用"
-    current: "§7当前版本: v{1}"
+    current: "§7当前版本: v{0}"
     download: "§6下载地址: §f{0}"
     click-to-download: "§a点击打开下载页面"
 
